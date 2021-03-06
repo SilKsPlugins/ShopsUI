@@ -1,0 +1,6 @@
+database:
+  ConnectionStrings:
+    default: "Server=127.0.0.1; Database=openmod; Port=3306; User=unturned; Password=password"
+
+effects:
+  ui: 29150

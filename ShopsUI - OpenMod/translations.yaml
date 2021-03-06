@@ -1,0 +1,51 @@
+commands:
+  success:
+    shop_added:
+      buyable_item: "The item {ItemAsset.ItemName} can now be bought for {CurrencySymbol}{Price:0.00}."
+      sellable_item: "The item {ItemAsset.ItemName} can now be sold for {CurrencySymbol}{Price:0.00}."
+      buyable_vehicle: "The vehicle {VehicleAsset.VehicleName} can now be bought for {CurrencySymbol}{Price:0.00}."
+    shop_removed:
+      buyable_item: "The item {ItemAsset.ItemName} can no longer be bought."
+      sellable_item: "The item {ItemAsset.ItemName} can no longer be sold."
+      buyable_vehicle: "The vehicle {VehicleAsset.VehicleName} can no longer be sold."
+    item_bought: "You have bought x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{Price:0.00}. Your balance is now {CurrencySymbol}{Balance:0.00}."
+    item_sold: "You have sold x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{Price:0.00}. Your balance is now {CurrencySymbol}{Balance:0.00}."
+    vehicle_bought: "You have bought a {ItemAsset.ItemName} for {CurrencySymbol}{Price:0.00}. Your balance is now {CurrencySymbol}{Balance:0.00}."
+    item_cost:
+      buy: "You can buy x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{BuyPrice:0.00}."
+      sell: "You can sell x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{SellPrice:0.00}."
+      buy_and_sell: "You can buy x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{BuyPrice:0.00} and sell for {CurrencySymbol}{SellPrice:0.00}."
+    vehicle_cost:
+      buy: "You can buy a {VehicleAsset.VehicleName} for {CurrencySymbol}{BuyPrice:0.00}."
+  errors:
+    invalid_item_id: "Given item id ({IdOrName}) does not exist."
+    invalid_vehicle_id: "Given vehicle id ({IdOrName}) does not exist."
+    invalid_price: "Given price ({Price:0.00}) is not greater than or equal to zero."
+    invalid_amount: "Given amount ({Amount}) is not greater than one."
+    not_enough_items: "You do not have enough of this item."
+    no_item_shop: "The item {ItemAsset.ItemName} cannot be bought or sold."
+    no_buyable_item_shop: "The item {ItemAsset.ItemName} cannot be bought."
+    no_sellable_item_shop: "The item {ItemAsset.ItemName} cannot be sold."
+    no_buyable_vehicle_shop: "The vehicle {VehicleAsset.VehicleName} cannot be bought."
+
+transactions:
+  items:
+    bought: "Purchased {Amount} {ItemAsset.ItemName} for {CurrencySymbol}{Price:0.##}"
+    sold: "Sold {Amount} {ItemAsset.ItemName} for {CurrencySymbol}{Price:0.##}"
+  vehicles:
+    bought: "Purchased {VehicleAsset.VehicleName} for {CurrencySymbol}{Price:0.##}"
+
+ui:
+  header: "Shops"
+  balance: "Balance: {CurrencySymbol}{Balance:0.00}"
+  items:
+    header: "Items"
+    listing:
+      content: "{ItemAsset.ItemName}"
+      buy: "Buy for {CurrencySymbol}{BuyPrice}"
+      sell: "Sell for {CurrencySymbol}{SellPrice}"
+  vehicles:
+    header: "Vehicles"
+    listing:
+      content: "{VehicleAsset.VehicleName}"
+      buy: "Buy for {CurrencySymbol}{BuyPrice}"
