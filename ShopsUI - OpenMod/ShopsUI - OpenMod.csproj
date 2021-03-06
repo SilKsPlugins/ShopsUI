@@ -52,6 +52,12 @@
     <Folder Include="Shops\Vehicles\Events\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="product.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
     <ItemGroup>
     </ItemGroup>
