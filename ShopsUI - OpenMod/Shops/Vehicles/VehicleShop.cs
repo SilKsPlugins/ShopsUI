@@ -52,7 +52,7 @@ namespace ShopsUI.Shops.Vehicles
         {
             var vehicleAsset = await GetVehicleAsset();
 
-            var balance = await _economyProvider.UpdateBalanceAsync(user.Id, user.Type, ShopData.BuyPrice,
+            var balance = await _economyProvider.UpdateBalanceAsync(user.Id, user.Type, -ShopData.BuyPrice,
                 _stringLocalizer["transactions:vehicles:bought",
                     new
                     {
