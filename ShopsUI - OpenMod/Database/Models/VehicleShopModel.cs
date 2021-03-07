@@ -13,10 +13,8 @@ namespace ShopsUI.Database.Models
 
         [NotMapped]
         ushort IVehicleShopData.VehicleId => (ushort) VehicleShopId;
-
+        
         public decimal BuyPrice { get; set; }
-
-        public decimal? SellPrice { get; set; }
 
         public VehicleShopModel()
         {
