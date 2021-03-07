@@ -3,6 +3,7 @@ using OpenMod.Extensions.Economy.Abstractions;
 using OpenMod.Extensions.Games.Abstractions.Vehicles;
 using OpenMod.Unturned.Users;
 using OpenMod.Unturned.Vehicles;
+using SDG.Unturned;
 using ShopsUI.API.Vehicles;
 using ShopsUI.Database.Models;
 using System;
@@ -62,7 +63,8 @@ namespace ShopsUI.Shops.Vehicles
                         _economyProvider.CurrencyName
                     }]);
 
-            await _vehicleSpawner.SpawnVehicleAsync(user.Player, vehicleAsset.VehicleAssetId);
+            VehicleTool.giveVehicle(user.Player.Player, ushort.Parse(vehicleAsset.VehicleAssetId));
+            //await _vehicleSpawner.SpawnVehicleAsync(user.Player, vehicleAsset.VehicleAssetId);
 
             return balance;
         }
