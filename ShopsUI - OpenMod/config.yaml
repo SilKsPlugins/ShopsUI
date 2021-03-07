@@ -2,5 +2,6 @@ database:
   ConnectionStrings:
     default: "Server=127.0.0.1; Database=openmod; Port=3306; User=unturned; Password=password"
 
-effects:
-  ui: 29150
+ui:
+  logoUrl: "https://i.imgur.com/t6HbFTN.png"
+  mainEffect: 29150

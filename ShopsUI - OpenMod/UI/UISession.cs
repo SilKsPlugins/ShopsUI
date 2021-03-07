@@ -38,6 +38,8 @@ namespace ShopsUI.UI
 
         public short EffectKey { get; }
 
+        public string LogoUrl { get; }
+
         public UISession(
             IConfiguration configuration,
             IStringLocalizer stringLocalizer,
@@ -56,8 +58,9 @@ namespace ShopsUI.UI
             _elementsShown = 0;
             _shownIds = new ushort[MaxItemsPerPage];
 
-            EffectId = configuration.GetValue<ushort>("effects:ui", 29150);
+            EffectId = configuration.GetValue<ushort>("ui:mainEffect", 29150);
             EffectKey = (short) EffectId;
+            LogoUrl = configuration.GetValue("ui:logoUrl", "https://i.imgur.com/t6HbFTN.png");
         }
 
         public async ValueTask DisposeAsync()
@@ -101,6 +104,8 @@ namespace ShopsUI.UI
                     _economyProvider.CurrencyName,
                     _economyProvider.CurrencySymbol
                 }]);
+
+            SetImage("ShopLogo", LogoUrl);
 
             await SetTab(tab);
         }
