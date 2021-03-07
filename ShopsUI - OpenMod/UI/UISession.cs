@@ -398,6 +398,8 @@ namespace ShopsUI.UI
                             var balance = await shop.Buy(User);
 
                             await ShowBalance(balance);
+
+                            await ShowAlert(_stringLocalizer["ui:items:bought"], true);
                         }
                     }
                 }
@@ -412,6 +414,8 @@ namespace ShopsUI.UI
                             var balance = await shop.Sell(User);
 
                             await ShowBalance(balance);
+
+                            await ShowAlert(_stringLocalizer["ui:items:sold"], true);
                         }
                     }
                 }
