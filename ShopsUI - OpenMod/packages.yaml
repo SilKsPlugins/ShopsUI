@@ -1,3 +1,5 @@
 ﻿packages:
 - id: OpenMod.EntityFrameworkCore
-  version: 3.0.18
+  version: 3.0.19+9380b22
+- id: Microsoft.EntityFrameworkCore.Relational
+  version: 3.1.12
