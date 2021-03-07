@@ -27,9 +27,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenMod.EntityFrameworkCore" Version="3.0.18" />
-    <PackageReference Include="OpenMod.Extensions.Economy.Abstractions" Version="3.0.18" />
-    <PackageReference Include="OpenMod.Unturned" Version="3.0.18" />
+    <PackageReference Include="OpenMod.EntityFrameworkCore" Version="3.0.19" />
+    <PackageReference Include="OpenMod.Extensions.Economy.Abstractions" Version="3.0.19" />
+    <PackageReference Include="OpenMod.Unturned" Version="3.0.19" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
