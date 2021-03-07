@@ -91,9 +91,7 @@ namespace ShopsUI.UI
             var balance = await _economyProvider.GetBalanceAsync(user.Id, user.Type);
 
             User.Player.Player.setPluginWidgetFlag(EPluginWidgetFlags.Modal | EPluginWidgetFlags.ForceBlur, true);
-
-            Console.WriteLine($"Showing {EffectId}");
-
+            
             EffectManager.sendUIEffect(EffectId, EffectKey, SteamId, true,
                 _stringLocalizer["ui:header"],
                 _stringLocalizer["ui:items:header"],
@@ -270,8 +268,6 @@ namespace ShopsUI.UI
         {
             if (CurrentTab == tab) return;
 
-            Console.WriteLine("Cleaning up " + CurrentTab + " " + _elementsShown);
-
             // Clean up current tab
             if (CurrentTab == UITab.Items || CurrentTab == UITab.Vehicles)
             {
@@ -296,8 +292,6 @@ namespace ShopsUI.UI
 
             // Show new tab
             CurrentTab = tab;
-
-            Console.WriteLine("Setting tab " + CurrentTab);
 
             if (CurrentTab == UITab.Items)
             {
