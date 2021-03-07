@@ -1,5 +1,6 @@
 commands:
   success:
+    shop_reloaded: "Shops successfully reloaded."
     shop_added:
       buyable_item: "The item {ItemAsset.ItemName} can now be bought for {CurrencySymbol}{Price:0.00}."
       sellable_item: "The item {ItemAsset.ItemName} can now be sold for {CurrencySymbol}{Price:0.00}."
