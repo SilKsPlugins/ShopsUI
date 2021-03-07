@@ -18,15 +18,19 @@ commands:
       buy_and_sell: "You can buy x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{BuyPrice:0.00} and sell for {CurrencySymbol}{SellPrice:0.00}."
     vehicle_cost:
       buy: "You can buy a {VehicleAsset.VehicleName} for {CurrencySymbol}{BuyPrice:0.00}."
+    shop_order:
+      item: "Successfuly set order value of {ItemAsset.ItemName} to {Order}."
+      vehicle: "Successfuly set order value of {VehicleAsset.VehicleName} to {Order}."
   errors:
     invalid_item_id: "Given item id ({IdOrName}) does not exist."
     invalid_vehicle_id: "Given vehicle id ({IdOrName}) does not exist."
     invalid_price: "Given price ({Price:0.00}) is not greater than or equal to zero."
     invalid_amount: "Given amount ({Amount}) is not greater than one."
     not_enough_items: "You do not have enough of this item."
-    no_item_shop: "The item {ItemAsset.ItemName} cannot be bought or sold."
+    no_item_shop: "No shop for {ItemAsset.ItemName} exists."
     no_buyable_item_shop: "The item {ItemAsset.ItemName} cannot be bought."
     no_sellable_item_shop: "The item {ItemAsset.ItemName} cannot be sold."
+    no_vehicle_shop: "No shop for {VehicleAsset.VehicleName} exists."
     no_buyable_vehicle_shop: "The vehicle {VehicleAsset.VehicleName} cannot be bought."
 
 transactions:

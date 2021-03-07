@@ -3,7 +3,7 @@ using MySql.Data.EntityFrameworkCore.Metadata;
 
 namespace ShopsUI.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitialRelease : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,7 +14,8 @@ namespace ShopsUI.Migrations
                     ItemShopId = table.Column<int>(nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     BuyPrice = table.Column<decimal>(nullable: true),
-                    SellPrice = table.Column<decimal>(nullable: true)
+                    SellPrice = table.Column<decimal>(nullable: true),
+                    Order = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,7 +29,7 @@ namespace ShopsUI.Migrations
                     VehicleShopId = table.Column<int>(nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     BuyPrice = table.Column<decimal>(nullable: false),
-                    SellPrice = table.Column<decimal>(nullable: true)
+                    Order = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

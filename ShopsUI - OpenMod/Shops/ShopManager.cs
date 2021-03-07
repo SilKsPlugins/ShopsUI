@@ -36,10 +36,14 @@ namespace ShopsUI.Shops
         private ShopsDbContext GetDbContext() => _cachedDbContext ??= GetPluginScope().Resolve<ShopsDbContext>();
 
         public IQueryable<IItemShopData> GetItemShopDatas() =>
-            GetDbContext().ItemShops.AsQueryable();
+            GetDbContext().ItemShops.AsQueryable()
+                .OrderByDescending(x => x.Order)
+                .ThenBy(x => x.ItemShopId);
 
         public IQueryable<IVehicleShopData> GetVehicleShopDatas() =>
-            GetDbContext().VehicleShops.AsQueryable();
+            GetDbContext().VehicleShops.AsQueryable()
+                .OrderByDescending(x => x.Order)
+                .ThenBy(x => x.VehicleShopId);
 
         public async Task<ItemShopModel?> GetItemShopData(ushort id) =>
             await GetDbContext().ItemShops.FindAsync((int) id);
@@ -58,8 +62,8 @@ namespace ShopsUI.Shops
             var data = await GetItemShopData(id);
 
             return data == null
-                ? null :
-                ActivatorUtilitiesEx.CreateInstance<ItemShop>(GetPluginScope(), data);
+                ? null
+                : ActivatorUtilitiesEx.CreateInstance<ItemShop>(GetPluginScope(), data);
         }
 
         public async Task<IVehicleShop?> GetVehicleShop(ushort id)
@@ -67,8 +71,8 @@ namespace ShopsUI.Shops
             var data = await GetVehicleShopData(id);
 
             return data == null
-                ? null :
-                ActivatorUtilitiesEx.CreateInstance<VehicleShop>(GetPluginScope(), data);
+                ? null
+                : ActivatorUtilitiesEx.CreateInstance<VehicleShop>(GetPluginScope(), data);
         }
         
         public async Task<IItemShop> AddItemShopBuyable(ushort id, decimal price)

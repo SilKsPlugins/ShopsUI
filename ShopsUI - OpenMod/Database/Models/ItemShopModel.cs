@@ -17,12 +17,15 @@ namespace ShopsUI.Database.Models
         public decimal? BuyPrice { get; set; }
 
         public decimal? SellPrice { get; set; }
+        
+        public int Order { get; set; }
 
         public ItemShopModel()
         {
             ItemShopId = 0;
             BuyPrice = null;
             SellPrice = null;
+            Order = 0;
         }
     }
 }

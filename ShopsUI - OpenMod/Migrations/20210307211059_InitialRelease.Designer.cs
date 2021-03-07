@@ -9,8 +9,8 @@ using ShopsUI.Database;
 namespace ShopsUI.Migrations
 {
     [DbContext(typeof(ShopsDbContext))]
-    [Migration("20210307190156_RemoveVehicleSellPrice")]
-    partial class RemoveVehicleSellPrice
+    [Migration("20210307211059_InitialRelease")]
+    partial class InitialRelease
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,6 +28,9 @@ namespace ShopsUI.Migrations
                     b.Property<decimal?>("BuyPrice")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("SellPrice")
                         .HasColumnType("decimal(18, 2)");
 
@@ -44,6 +47,9 @@ namespace ShopsUI.Migrations
 
                     b.Property<decimal>("BuyPrice")
                         .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
 
                     b.HasKey("VehicleShopId");
 

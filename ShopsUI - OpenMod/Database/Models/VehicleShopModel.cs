@@ -15,11 +15,14 @@ namespace ShopsUI.Database.Models
         ushort IVehicleShopData.VehicleId => (ushort) VehicleShopId;
         
         public decimal BuyPrice { get; set; }
+        
+        public int Order { get; set; }
 
         public VehicleShopModel()
         {
             VehicleShopId = 0;
             BuyPrice = 0;
+            Order = 0;
         }
     }
 }

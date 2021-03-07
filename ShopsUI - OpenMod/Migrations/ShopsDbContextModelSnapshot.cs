@@ -26,6 +26,9 @@ namespace ShopsUI.Migrations
                     b.Property<decimal?>("BuyPrice")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("SellPrice")
                         .HasColumnType("decimal(18, 2)");
 
@@ -42,6 +45,9 @@ namespace ShopsUI.Migrations
 
                     b.Property<decimal>("BuyPrice")
                         .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
 
                     b.HasKey("VehicleShopId");
 
