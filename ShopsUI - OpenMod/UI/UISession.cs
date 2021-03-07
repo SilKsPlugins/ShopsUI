@@ -309,7 +309,8 @@ namespace ShopsUI.UI
         {
             var key = isSuccess ? "AlertSuccessText" : "AlertFailureText";
 
-            SetVisibility(key, false);
+            SetVisibility("AlertSuccessText", false);
+            SetVisibility("AlertFailureText", false);
             SetText(key, message);
             SetVisibility(key, true);
 
