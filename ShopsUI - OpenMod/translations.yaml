@@ -47,10 +47,12 @@ ui:
     header: "Items"
     listing:
       content: "{ItemAsset.ItemName}"
-      buy: "Buy for {CurrencySymbol}{BuyPrice}"
-      sell: "Sell for {CurrencySymbol}{SellPrice}"
+      buy: "Buy for {CurrencySymbol}{BuyPrice:0.##}"
+      sell: "Sell for {CurrencySymbol}{SellPrice:0.##}"
+    bought: "Successfully purchased."
+    sold: "Successfully sold."
   vehicles:
     header: "Vehicles"
     listing:
       content: "{VehicleAsset.VehicleName}"
-      buy: "Buy for {CurrencySymbol}{BuyPrice}"
+      buy: "Buy for {CurrencySymbol}{BuyPrice:0.##}"
