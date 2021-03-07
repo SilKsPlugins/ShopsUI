@@ -10,7 +10,6 @@ using OpenMod.Unturned.Items;
 using OpenMod.Unturned.Users;
 using ShopsUI.API;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShopsUI.Commands
@@ -79,21 +78,10 @@ namespace ShopsUI.Commands
             if (string.IsNullOrWhiteSpace(idOrName))
                 throw new UserFriendlyException(StringLocalizer["commands:errors:invalid_vehicle_id", new { IdOrName = idOrName }]);
 
-            var assets = await VehicleDirectory.GetVehicleAssetsAsync();
-
-            IVehicleAsset? asset;
-
-            if (ushort.TryParse(idOrName, out _))
-            {
-                asset = assets.FirstOrDefault(x => x.VehicleAssetId.Equals(idOrName));
-
-                if (asset != null) return asset;
-            }
-
-            // todo: implement name matching
-            //asset = await VehicleDirectory.FindByNameAsync(idOrName);
-
-            throw new UserFriendlyException(StringLocalizer["commands:errors:invalid_vehicle_id", new { IdOrName = idOrName }]);
+            return await VehicleDirectory.FindByIdAsync(idOrName)
+                   ?? await VehicleDirectory.FindByNameAsync(idOrName, false)
+                   ?? throw new UserFriendlyException(
+                       StringLocalizer["commands:errors:invalid_vehicle_id", new {IdOrName = idOrName}]);
         }
 
         protected async Task<decimal> GetPrice(int index)
