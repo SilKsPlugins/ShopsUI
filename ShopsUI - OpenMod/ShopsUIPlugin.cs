@@ -23,10 +23,5 @@ namespace ShopsUI
         {
             await _dbContext.OpenModMigrateAsync();
         }
-
-        protected override async UniTask OnUnloadAsync()
-        {
-
-        }
     }
 }
