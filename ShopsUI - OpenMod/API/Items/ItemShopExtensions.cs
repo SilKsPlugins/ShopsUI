@@ -1,23 +1,24 @@
 ﻿using OpenMod.Unturned.Users;
+using System.Threading.Tasks;
 
 namespace ShopsUI.API.Items
 {
     public static class ItemShopExtensions
     {
-        public static bool TryBuy(this IItemShop shop, UnturnedUser user, int amount = 1)
+        public static async Task<bool> TryBuy(this IItemShop shop, UnturnedUser user)
         {
             if (shop.CanBuy()) return false;
 
-            shop.Buy(user, amount);
+            await shop.Buy(user);
 
             return true;
         }
 
-        public static bool TrySell(this IItemShop shop, UnturnedUser user, int amount = 1)
+        public static async Task<bool> TrySell(this IItemShop shop, UnturnedUser user)
         {
             if (shop.CanSell()) return false;
 
-            shop.Sell(user, amount);
+            await shop.Sell(user);
 
             return true;
         }
