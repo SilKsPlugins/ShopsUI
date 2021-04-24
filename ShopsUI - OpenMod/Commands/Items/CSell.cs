@@ -2,6 +2,7 @@
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
+using OpenMod.Unturned.Users;
 using System;
 
 namespace ShopsUI.Commands.Items
@@ -13,6 +14,7 @@ namespace ShopsUI.Commands.Items
     [CommandAlias("sellitem")]
     [CommandSyntax("<item> [amount]")]
     [CommandDescription("Sells an item to the shop.")]
+    [CommandActor(typeof(UnturnedUser))]
     public class CSell : ShopCommand
     {
         public CSell(IServiceProvider serviceProvider) : base(serviceProvider)

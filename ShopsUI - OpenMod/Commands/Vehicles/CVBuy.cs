@@ -2,6 +2,7 @@
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
+using OpenMod.Unturned.Users;
 using System;
 
 namespace ShopsUI.Commands.Vehicles
@@ -12,6 +13,7 @@ namespace ShopsUI.Commands.Vehicles
     [CommandAlias("buyvehicle")]
     [CommandSyntax("<vehicle>")]
     [CommandDescription("Buys the item from the shop.")]
+    [CommandActor(typeof(UnturnedUser))]
     public class CVBuy : ShopCommand
     {
         public CVBuy(IServiceProvider serviceProvider) : base(serviceProvider)

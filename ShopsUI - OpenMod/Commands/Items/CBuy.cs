@@ -1,9 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
-using System;
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
-using OpenMod.Extensions.Economy.Abstractions;
+using OpenMod.Unturned.Users;
+using System;
 
 namespace ShopsUI.Commands.Items
 {
@@ -14,6 +14,7 @@ namespace ShopsUI.Commands.Items
     [CommandAlias("buyitem")]
     [CommandSyntax("<item> [amount]")]
     [CommandDescription("Buys the item from the shop.")]
+    [CommandActor(typeof(UnturnedUser))]
     public class CBuy : ShopCommand
     {
         public CBuy(IServiceProvider serviceProvider) : base(serviceProvider)
