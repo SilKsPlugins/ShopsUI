@@ -11,8 +11,10 @@ namespace ShopsUI.Database.Models
         [Key]
         public ushort ItemId { get; set; }
 
+        [Column(TypeName = "decimal(24,2)")]
         public decimal? BuyPrice { get; set; }
 
+        [Column(TypeName = "decimal(24,2)")]
         public decimal? SellPrice { get; set; }
         
         public int Order { get; set; }
