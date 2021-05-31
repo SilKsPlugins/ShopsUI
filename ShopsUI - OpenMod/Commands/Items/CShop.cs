@@ -3,6 +3,7 @@ using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Commands;
+using OpenMod.Unturned.Users;
 using ShopsUI.API.UI;
 using ShopsUI.UI;
 using SilK.Unturned.Extras.UI;
