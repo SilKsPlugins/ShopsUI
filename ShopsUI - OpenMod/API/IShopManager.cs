@@ -1,7 +1,9 @@
-﻿using OpenMod.API.Ioc;
+﻿using System;
+using System.Collections.Generic;
+using OpenMod.API.Ioc;
+using OpenMod.API.Permissions;
 using ShopsUI.API.Items;
 using ShopsUI.API.Vehicles;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,11 +12,13 @@ namespace ShopsUI.API
     [Service]
     public interface IShopManager
     {
-        IQueryable<IItemShopData> GetItemShopDatas();
-        IQueryable<IVehicleShopData> GetVehicleShopDatas();
-
         Task<IItemShopData?> GetItemShopData(ushort id);
         Task<IVehicleShopData?> GetVehicleShopData(ushort id);
+
+        Task<ICollection<IItemShopData>> GetItemShopDatasAsync(
+            Func<IQueryable<IItemShopData>, IQueryable<IItemShopData>> query);
+        Task<ICollection<IVehicleShopData>> GetVehicleShopDatasAsync(
+            Func<IQueryable<IVehicleShopData>, IQueryable<IVehicleShopData>> query);
 
         Task<IItemShop?> GetItemShop(ushort id);
         Task<IVehicleShop?> GetVehicleShop(ushort id);

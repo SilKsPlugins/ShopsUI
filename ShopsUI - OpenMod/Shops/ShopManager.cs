@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenMod.API.Ioc;
 using OpenMod.API.Plugins;
@@ -11,7 +12,9 @@ using ShopsUI.Database;
 using ShopsUI.Database.Models;
 using ShopsUI.Shops.Items;
 using ShopsUI.Shops.Vehicles;
+using SilK.Unturned.Extras.Dispatcher;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,11 +24,14 @@ namespace ShopsUI.Shops
     public class ShopManager : IShopManager
     {
         private readonly IPluginAccessor<ShopsUIPlugin> _pluginAccessor;
+        private readonly IActionDispatcher _actionDispatcher;
 
         public ShopManager(
-            IPluginAccessor<ShopsUIPlugin> pluginAccessor)
+            IPluginAccessor<ShopsUIPlugin> pluginAccessor,
+            IActionDispatcher actionDispatcher)
         {
             _pluginAccessor = pluginAccessor;
+            _actionDispatcher = actionDispatcher;
         }
 
         private ILifetimeScope GetPluginScope() => _pluginAccessor.Instance?.LifetimeScope ??
@@ -35,24 +41,46 @@ namespace ShopsUI.Shops
 
         private ShopsDbContext GetDbContext() => _cachedDbContext ??= GetPluginScope().Resolve<ShopsDbContext>();
 
-        public IQueryable<IItemShopData> GetItemShopDatas() =>
-            GetDbContext().ItemShops.AsQueryable()
-                .OrderByDescending(x => x.Order)
-                .ThenBy(x => x.ItemShopId);
+        public async Task<ICollection<IItemShopData>> GetItemShopDatasAsync(
+            Func<IQueryable<IItemShopData>, IQueryable<IItemShopData>> query)
+        {
+            return await _actionDispatcher.Enqueue(async () =>
+            {
+                var queryable = GetDbContext().ItemShops
+                    .OrderByDescending(x => x.Order)
+                    .ThenBy(x => x.ItemShopId);
 
-        public IQueryable<IVehicleShopData> GetVehicleShopDatas() =>
-            GetDbContext().VehicleShops.AsQueryable()
-                .OrderByDescending(x => x.Order)
-                .ThenBy(x => x.VehicleShopId);
+                return await query(queryable).ToListAsync();
+            });
+        }
 
-        public async Task<ItemShopModel?> GetItemShopData(ushort id) =>
-            await GetDbContext().ItemShops.FindAsync((int) id);
+        public async Task<ICollection<IVehicleShopData>> GetVehicleShopDatasAsync(
+            Func<IQueryable<IVehicleShopData>, IQueryable<IVehicleShopData>> query)
+        {
+            return await _actionDispatcher.Enqueue(async () =>
+            {
+                var queryable = GetDbContext().VehicleShops
+                    .OrderByDescending(x => x.Order)
+                    .ThenBy(x => x.VehicleShopId);
+
+                return await query(queryable).ToListAsync();
+            });
+        }
+
+        public Task<ItemShopModel?> GetItemShopData(ushort id)
+        {
+            return _actionDispatcher.Enqueue(async () =>
+                (ItemShopModel?) await GetDbContext().ItemShops.FindAsync((int)id));
+        }
 
         async Task<IItemShopData?> IShopManager.GetItemShopData(ushort id) =>
             await GetItemShopData(id);
 
-        public async Task<VehicleShopModel?> GetVehicleShopData(ushort id) =>
-            await GetDbContext().VehicleShops.FindAsync((int) id);
+        public Task<VehicleShopModel?> GetVehicleShopData(ushort id)
+        {
+            return _actionDispatcher.Enqueue(async () =>
+                (VehicleShopModel?) await GetDbContext().VehicleShops.FindAsync((int)id));
+        }
 
         async Task<IVehicleShopData?> IShopManager.GetVehicleShopData(ushort id) =>
             await GetVehicleShopData(id);
@@ -77,149 +105,167 @@ namespace ShopsUI.Shops
         
         public async Task<IItemShop> AddItemShopBuyable(ushort id, decimal price)
         {
-            var data = await GetItemShopData(id);
-
-            var dbContext = GetDbContext();
-
-            if (data == null)
+            return await _actionDispatcher.Enqueue(async () =>
             {
-                data = new ItemShopModel
+                var dbContext = GetDbContext();
+
+                var data = await dbContext.ItemShops.FindAsync(id);
+
+                if (data == null)
                 {
-                    ItemShopId = id,
-                    BuyPrice = price
-                };
+                    data = new ItemShopModel
+                    {
+                        ItemShopId = id,
+                        BuyPrice = price
+                    };
 
-                await dbContext.ItemShops.AddAsync(data);
-            }
-            else
-            {
-                data.BuyPrice = price;
+                    await dbContext.ItemShops.AddAsync(data);
+                }
+                else
+                {
+                    data.BuyPrice = price;
 
-                dbContext.ItemShops.Update(data);
-            }
+                    dbContext.ItemShops.Update(data);
+                }
 
-            await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
 
-            return ActivatorUtilitiesEx.CreateInstance<ItemShop>(GetPluginScope(), data);
+                return ActivatorUtilitiesEx.CreateInstance<ItemShop>(GetPluginScope(), data);
+            });
         }
 
         public async Task<IItemShop> AddItemShopSellable(ushort id, decimal price)
         {
-            var data = await GetItemShopData(id);
-
-            var dbContext = GetDbContext();
-
-            if (data == null)
+            return await _actionDispatcher.Enqueue(async () =>
             {
-                data = new ItemShopModel
+                var dbContext = GetDbContext();
+
+                var data = await dbContext.ItemShops.FindAsync(id);
+
+                if (data == null)
                 {
-                    ItemShopId = id,
-                    SellPrice = price
-                };
+                    data = new ItemShopModel
+                    {
+                        ItemShopId = id,
+                        SellPrice = price
+                    };
 
-                await dbContext.ItemShops.AddAsync(data);
-            }
-            else
-            {
-                data.SellPrice = price;
+                    await dbContext.ItemShops.AddAsync(data);
+                }
+                else
+                {
+                    data.SellPrice = price;
 
-                dbContext.ItemShops.Update(data);
-            }
+                    dbContext.ItemShops.Update(data);
+                }
 
-            await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
 
-            return ActivatorUtilitiesEx.CreateInstance<ItemShop>(GetPluginScope(), data);
+                return ActivatorUtilitiesEx.CreateInstance<ItemShop>(GetPluginScope(), data);
+            });
         }
 
         public async Task<IVehicleShop> AddVehicleShopBuyable(ushort id, decimal price)
         {
-            var data = await GetVehicleShopData(id);
-
-            var dbContext = GetDbContext();
-
-            if (data == null)
+            return await _actionDispatcher.Enqueue(async () =>
             {
-                data = new VehicleShopModel
+                var dbContext = GetDbContext();
+
+                var data = await dbContext.VehicleShops.FindAsync(id);
+
+                if (data == null)
                 {
-                    VehicleShopId = id,
-                    BuyPrice = price
-                };
+                    data = new VehicleShopModel
+                    {
+                        VehicleShopId = id,
+                        BuyPrice = price
+                    };
 
-                await dbContext.VehicleShops.AddAsync(data);
-            }
-            else
-            {
-                data.BuyPrice = price;
+                    await dbContext.VehicleShops.AddAsync(data);
+                }
+                else
+                {
+                    data.BuyPrice = price;
 
-                dbContext.VehicleShops.Update(data);
-            }
+                    dbContext.VehicleShops.Update(data);
+                }
 
-            await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
 
-            return ActivatorUtilitiesEx.CreateInstance<VehicleShop>(GetPluginScope(), data);
+                return ActivatorUtilitiesEx.CreateInstance<VehicleShop>(GetPluginScope(), data);
+            });
         }
 
-        public async Task<bool> RemoveItemShopBuyable(ushort id)
+        public Task<bool> RemoveItemShopBuyable(ushort id)
         {
-            var data = await GetItemShopData(id);
-
-            var dbContext = GetDbContext();
-
-            if (data?.BuyPrice == null) return false;
-
-            data.BuyPrice = null;
-
-            if (data.SellPrice == null)
+            return _actionDispatcher.Enqueue(async () =>
             {
-                dbContext.ItemShops.Remove(data);
-            }
-            else
-            {
-                dbContext.ItemShops.Update(data);
-            }
+                var dbContext = GetDbContext();
 
-            await dbContext.SaveChangesAsync();
+                var data = await dbContext.ItemShops.FindAsync((int)id);
+                
+                if (data?.BuyPrice == null) return false;
 
-            return true;
+                data.BuyPrice = null;
+
+                if (data.SellPrice == null)
+                {
+                    dbContext.ItemShops.Remove(data);
+                }
+                else
+                {
+                    dbContext.ItemShops.Update(data);
+                }
+
+                await dbContext.SaveChangesAsync();
+
+                return true;
+            });
         }
 
-        public async Task<bool> RemoveItemShopSellable(ushort id)
+        public Task<bool> RemoveItemShopSellable(ushort id)
         {
-            var data = await GetItemShopData(id);
-
-            var dbContext = GetDbContext();
-
-            if (data?.SellPrice == null) return false;
-
-            data.SellPrice = null;
-
-            if (data.BuyPrice == null)
+            return _actionDispatcher.Enqueue(async () =>
             {
-                dbContext.ItemShops.Remove(data);
-            }
-            else
-            {
-                dbContext.ItemShops.Update(data);
-            }
+                var dbContext = GetDbContext();
 
-            await dbContext.SaveChangesAsync();
+                var data = await dbContext.ItemShops.FindAsync((int)id);
 
-            return true;
+                if (data?.SellPrice == null) return false;
+
+                data.SellPrice = null;
+
+                if (data.BuyPrice == null)
+                {
+                    dbContext.ItemShops.Remove(data);
+                }
+                else
+                {
+                    dbContext.ItemShops.Update(data);
+                }
+
+                await dbContext.SaveChangesAsync();
+
+                return true;
+            });
         }
 
-        public async Task<bool> RemoveVehicleShopBuyable(ushort id)
+        public Task<bool> RemoveVehicleShopBuyable(ushort id)
         {
-            var data = await GetVehicleShopData(id);
+            return _actionDispatcher.Enqueue(async () =>
+            {
+                var dbContext = GetDbContext();
 
-            var dbContext = GetDbContext();
+                var data = await dbContext.VehicleShops.FindAsync((int)id);
 
-            if (data == null) return false;
+                if (data == null) return false;
 
-            dbContext.VehicleShops.Remove(data);
+                dbContext.VehicleShops.Remove(data);
 
-            await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
 
-            return true;
+                return true;
+            });
         }
     }
 }
