@@ -4,7 +4,7 @@ namespace ShopsUI.API.Items
 {
     public interface IItemShopData
     {
-        public ushort ItemId { get; }
+        public ushort ItemShopId { get; }
 
         public decimal? BuyPrice { get; }
 
