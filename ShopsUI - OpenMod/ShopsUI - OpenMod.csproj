@@ -46,13 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="API\Items\Events\" />
-    <Folder Include="API\Vehicles\Events\" />
-    <Folder Include="Shops\Items\Events\" />
-    <Folder Include="Shops\Vehicles\Events\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="product.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
