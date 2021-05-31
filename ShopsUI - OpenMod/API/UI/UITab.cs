@@ -4,7 +4,6 @@
     {
         None,
         Items,
-        Vehicles,
-        Settings
+        Vehicles
     }
 }
