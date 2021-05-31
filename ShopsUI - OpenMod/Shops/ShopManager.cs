@@ -48,7 +48,7 @@ namespace ShopsUI.Shops
             {
                 var queryable = GetDbContext().ItemShops
                     .OrderByDescending(x => x.Order)
-                    .ThenBy(x => x.ItemShopId);
+                    .ThenBy(x => x.ItemId);
 
                 return await query(queryable).ToListAsync();
             });
@@ -61,7 +61,7 @@ namespace ShopsUI.Shops
             {
                 var queryable = GetDbContext().VehicleShops
                     .OrderByDescending(x => x.Order)
-                    .ThenBy(x => x.VehicleShopId);
+                    .ThenBy(x => x.VehicleId);
 
                 return await query(queryable).ToListAsync();
             });
@@ -115,7 +115,7 @@ namespace ShopsUI.Shops
                 {
                     data = new ItemShopModel
                     {
-                        ItemShopId = id,
+                        ItemId = id,
                         BuyPrice = price
                     };
 
@@ -146,7 +146,7 @@ namespace ShopsUI.Shops
                 {
                     data = new ItemShopModel
                     {
-                        ItemShopId = id,
+                        ItemId = id,
                         SellPrice = price
                     };
 
@@ -177,7 +177,7 @@ namespace ShopsUI.Shops
                 {
                     data = new VehicleShopModel
                     {
-                        VehicleShopId = id,
+                        VehicleId = id,
                         BuyPrice = price
                     };
 

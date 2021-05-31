@@ -9,10 +9,8 @@ namespace ShopsUI.Database.Models
     public class VehicleShopModel : IVehicleShopData
     {
         [Key]
-        public int VehicleShopId { get; set; }
+        public ushort VehicleId { get; set; }
 
-        [NotMapped]
-        ushort IVehicleShopData.VehicleId => (ushort) VehicleShopId;
         
         public decimal BuyPrice { get; set; }
         
@@ -20,7 +18,7 @@ namespace ShopsUI.Database.Models
 
         public VehicleShopModel()
         {
-            VehicleShopId = 0;
+            VehicleId = 0;
             BuyPrice = 0;
             Order = 0;
         }

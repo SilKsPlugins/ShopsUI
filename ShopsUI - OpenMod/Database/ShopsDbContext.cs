@@ -22,10 +22,10 @@ namespace ShopsUI.Database
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ItemShopModel>()
-                .HasKey(x => x.ItemShopId);
+                .HasKey(x => x.ItemId);
 
             modelBuilder.Entity<VehicleShopModel>()
-                .HasKey(x => x.VehicleShopId);
+                .HasKey(x => x.VehicleId);
         }
     }
 }

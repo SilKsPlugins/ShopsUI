@@ -9,10 +9,7 @@ namespace ShopsUI.Database.Models
     public class ItemShopModel : IItemShopData
     {
         [Key]
-        public int ItemShopId { get; set; }
-
-        [NotMapped]
-        ushort IItemShopData.ItemId => (ushort) ItemShopId;
+        public ushort ItemId { get; set; }
 
         public decimal? BuyPrice { get; set; }
 
@@ -22,7 +19,7 @@ namespace ShopsUI.Database.Models
 
         public ItemShopModel()
         {
-            ItemShopId = 0;
+            ItemId = 0;
             BuyPrice = null;
             SellPrice = null;
             Order = 0;
