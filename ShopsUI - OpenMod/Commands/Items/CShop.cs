@@ -1,11 +1,12 @@
-﻿using OpenMod.Unturned.Commands;
-using System;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
-using OpenMod.Unturned.Users;
+using OpenMod.Unturned.Commands;
 using ShopsUI.API.UI;
+using ShopsUI.UI;
+using SilK.Unturned.Extras.UI;
+using System;
 
 namespace ShopsUI.Commands.Items
 {
@@ -33,7 +34,9 @@ namespace ShopsUI.Commands.Items
             if (Context.Actor is not UnturnedUser user)
                 throw new UserFriendlyException("This command can only be called by a player");
 
-            await _uiManager.StartSession(user);
+            var session = await _uiManager.StartSession<ShopsUISession>(user);
+
+            await session.SetTab(UITab.Items);
         }
     }
 }

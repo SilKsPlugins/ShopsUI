@@ -6,6 +6,8 @@ using OpenMod.Unturned.Commands;
 using OpenMod.Unturned.Users;
 using ShopsUI.API.UI;
 using System;
+using ShopsUI.UI;
+using SilK.Unturned.Extras.UI;
 
 namespace ShopsUI.Commands.Vehicles
 {
@@ -31,7 +33,9 @@ namespace ShopsUI.Commands.Vehicles
             if (Context.Actor is not UnturnedUser user)
                 throw new UserFriendlyException("This command can only be called by a player");
 
-            await _uiManager.StartSession(user, UITab.Vehicles);
+            var session = await _uiManager.StartSession<ShopsUISession>(user);
+
+            await session.SetTab(UITab.Vehicles);
         }
     }
 }

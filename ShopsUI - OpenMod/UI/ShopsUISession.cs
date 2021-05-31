@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using OpenMod.API.Commands;
@@ -10,15 +9,15 @@ using OpenMod.Unturned.Users;
 using SDG.Unturned;
 using ShopsUI.API;
 using ShopsUI.API.UI;
-using Steamworks;
+using SilK.Unturned.Extras.UI;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ShopsUI.UI
 {
-    public class UISession : IUISession, IAsyncDisposable
+    public class ShopsUISession : SingleEffectUISession
     {
+        private readonly IConfiguration _configuration;
         private readonly IStringLocalizer _stringLocalizer;
         private readonly IEconomyProvider _economyProvider;
         private readonly IShopManager _shopManager;
@@ -33,21 +32,24 @@ namespace ShopsUI.UI
         private readonly ushort[] _shownIds;
 
         private const int MaxItemsPerPage = 12;
-        
-        public ushort EffectId { get; }
 
-        public short EffectKey { get; }
+        public override string Id => "SilK.ShopsUI";
 
-        public string LogoUrl { get; }
+        public override ushort EffectId => _configuration.GetValue<ushort>("ui:mainEffect", 29150);
 
-        public UISession(
+        public string? LogoUrl => _configuration.GetValue("ui:logoUrl", "https://i.imgur.com/t6HbFTN.png");
+
+        public ShopsUISession(
+            UnturnedUser user,
             IConfiguration configuration,
             IStringLocalizer stringLocalizer,
             IEconomyProvider economyProvider,
             IShopManager shopManager,
             IItemDirectory itemDirectory,
-            IVehicleDirectory vehicleDirectory)
+            IVehicleDirectory vehicleDirectory,
+            IServiceProvider serviceProvider) : base(user, serviceProvider)
         {
+            _configuration = configuration;
             _stringLocalizer = stringLocalizer;
             _economyProvider = economyProvider;
             _shopManager = shopManager;
@@ -57,42 +59,22 @@ namespace ShopsUI.UI
             _currentPage = -1;
             _elementsShown = 0;
             _shownIds = new ushort[MaxItemsPerPage];
-
-            EffectId = configuration.GetValue<ushort>("ui:mainEffect", 29150);
-            EffectKey = (short) EffectId;
-            LogoUrl = configuration.GetValue("ui:logoUrl", "https://i.imgur.com/t6HbFTN.png");
         }
-
-        public async ValueTask DisposeAsync()
-        {
-            if (_isDisposing) return;
-            _isDisposing = true;
-            
-            await EndSession();
-        }
-
-        public UnturnedUser User { get; private set; } = null!;
-
-        public CSteamID SteamId => User.SteamId;
 
         public UITab CurrentTab { get; private set; }
 
-        public delegate void SessionEnded(UnturnedUser user, UISession session);
-
-        public event SessionEnded? OnSessionEnded;
-
-        public async UniTask StartSession(UnturnedUser user, UITab tab = UITab.Items)
+        protected override async UniTask OnStartAsync()
         {
+            var balance = await _economyProvider.GetBalanceAsync(User.Id, User.Type);
+
             await UniTask.SwitchToMainThread();
 
-            User = user;
             CurrentTab = UITab.None;
 
-            var balance = await _economyProvider.GetBalanceAsync(user.Id, user.Type);
 
-            User.Player.Player.setPluginWidgetFlag(EPluginWidgetFlags.Modal | EPluginWidgetFlags.ForceBlur, true);
-            
-            EffectManager.sendUIEffect(EffectId, EffectKey, SteamId, true,
+            await SetCursor(true);
+
+            SendUIEffect(
                 _stringLocalizer["ui:header"],
                 _stringLocalizer["ui:items:header"],
                 _stringLocalizer["ui:vehicles:header"],
@@ -103,34 +85,24 @@ namespace ShopsUI.UI
                     _economyProvider.CurrencySymbol
                 }]);
 
-            SetImage("ShopLogo", LogoUrl);
+            var logoUrl = LogoUrl;
 
-            await SetTab(tab);
+            if (!string.IsNullOrEmpty(logoUrl))
+            {
+                SendImage("ShopLogo", logoUrl!);
+            }
         }
 
         public async UniTask EndSession()
         {
             await UniTask.SwitchToMainThread();
 
-            EffectManager.askEffectClearByID(EffectId, SteamId);
-
-            User.Player.Player.setPluginWidgetFlag(EPluginWidgetFlags.Modal | EPluginWidgetFlags.ForceBlur, false);
-
-            OnSessionEnded?.Invoke(User, this);
+            ClearEffect();
         }
-
-        private void SetVisibility(string childName, bool visible) =>
-            EffectManager.sendUIEffectVisibility(EffectKey, SteamId, true, childName, visible);
-
-        private void SetText(string childName, string text) =>
-            EffectManager.sendUIEffectText(EffectKey, SteamId, true, childName, text);
-
-        private void SetImage(string childName, string url, bool shouldCache = true, bool forceRefresh = false) =>
-            EffectManager.sendUIEffectImageURL(EffectKey, SteamId, true, childName, url, shouldCache, forceRefresh);
 
         private UniTask ShowBalance(decimal balance)
         {
-            SetText("ShopBalance", _stringLocalizer["ui:balance", new
+            SendText("ShopBalance", _stringLocalizer["ui:balance", new
             {
                 Balance = balance,
                 _economyProvider.CurrencyName,
@@ -143,15 +115,15 @@ namespace ShopsUI.UI
         private async UniTask ShowItemShopPage(int page)
         {
             var shops =
-                await _shopManager.GetItemShopDatas()
+                (await _shopManager.GetItemShopDatasAsync(x => x
                     .Skip(page * MaxItemsPerPage)
-                    .Take(MaxItemsPerPage + 1)
-                    .ToListAsync();
+                    .Take(MaxItemsPerPage + 1)))
+                .ToList();
 
             _currentPage = page;
 
-            SetVisibility("PrevPage", _currentPage > 0);
-            SetVisibility("NextPage", shops.Count > MaxItemsPerPage);
+            SendVisibility("PrevPage", _currentPage > 0);
+            SendVisibility("NextPage", shops.Count > MaxItemsPerPage);
 
             _elementsShown = shops.Count > MaxItemsPerPage ? MaxItemsPerPage : shops.Count;
 
@@ -167,63 +139,62 @@ namespace ShopsUI.UI
 
                 if (asset == null) throw new Exception($"No item with id '{shop.ItemId}' exists");
 
-                SetText($"ItemName ({i})", _stringLocalizer["ui:items:listing:content", new { ItemAsset = asset }]);
+                SendText($"ItemName ({i})", _stringLocalizer["ui:items:listing:content", new { ItemAsset = asset }]);
 
                 if (shop.BuyPrice != null)
                 {
-                    SetText($"BuyItem ({i})", _stringLocalizer["ui:items:listing:buy", new
+                    SendText($"BuyItem ({i})", _stringLocalizer["ui:items:listing:buy", new
                     {
                         shop.BuyPrice,
                         _economyProvider.CurrencyName,
                         _economyProvider.CurrencySymbol
                     }]);
-                    SetVisibility($"BuyItem ({i})", true);
+                    SendVisibility($"BuyItem ({i})", true);
                 }
                 else
                 {
-                    SetVisibility($"BuyItem ({i})", false);
+                    SendVisibility($"BuyItem ({i})", false);
                 }
 
                 if (shop.SellPrice != null)
                 {
-                    SetText($"SellItem ({i})", _stringLocalizer["ui:items:listing:sell", new
+                    SendText($"SellItem ({i})", _stringLocalizer["ui:items:listing:sell", new
                     {
                         shop.SellPrice,
                         _economyProvider.CurrencyName,
                         _economyProvider.CurrencySymbol
                     }]);
-                    SetVisibility($"SellItem ({i})", true);
+                    SendVisibility($"SellItem ({i})", true);
                 }
                 else
                 {
-                    SetVisibility($"SellItem ({i})", false);
+                    SendVisibility($"SellItem ({i})", false);
                 }
 
-                SetVisibility($"Item ({i})", true);
+                SendVisibility($"Item ({i})", true);
             }
 
             for (; i < MaxItemsPerPage; i++)
             {
-                SetVisibility($"Item ({i})", false);
-                SetVisibility($"BuyItem ({i})", false);
-                SetVisibility($"SellItem ({i})", false);
+                SendVisibility($"Item ({i})", false);
+                SendVisibility($"BuyItem ({i})", false);
+                SendVisibility($"SellItem ({i})", false);
             }
 
-            SetVisibility("ItemBody", true);
+            SendVisibility("ItemBody", true);
         }
 
         private async UniTask ShowVehicleShopPage(int page)
         {
             var shops =
-                await _shopManager.GetVehicleShopDatas()
+                (await _shopManager.GetVehicleShopDatasAsync(x => x
                     .Skip(page * MaxItemsPerPage)
-                    .Take(MaxItemsPerPage + 1)
-                    .ToListAsync();
+                    .Take(MaxItemsPerPage + 1))).ToList();
 
             _currentPage = page;
 
-            SetVisibility("PrevPage", _currentPage > 0);
-            SetVisibility("NextPage", shops.Count > MaxItemsPerPage);
+            SendVisibility("PrevPage", _currentPage > 0);
+            SendVisibility("NextPage", shops.Count > MaxItemsPerPage);
 
             _elementsShown = shops.Count > MaxItemsPerPage ? MaxItemsPerPage : shops.Count;
 
@@ -241,27 +212,27 @@ namespace ShopsUI.UI
 
                 if (asset == null) throw new Exception($"No vehicle with id '{shop.VehicleId}' exists");
 
-                SetText($"VehicleName ({i})", _stringLocalizer["ui:vehicles:listing:content", new { VehicleAsset = asset }]);
+                SendText($"VehicleName ({i})", _stringLocalizer["ui:vehicles:listing:content", new { VehicleAsset = asset }]);
 
-                SetText($"BuyVehicle ({i})", _stringLocalizer["ui:vehicles:listing:buy", new
+                SendText($"BuyVehicle ({i})", _stringLocalizer["ui:vehicles:listing:buy", new
                 {
                     shop.BuyPrice,
                     _economyProvider.CurrencyName,
                     _economyProvider.CurrencySymbol
                 }]);
-                SetVisibility($"BuyVehicle ({i})", true);
+                SendVisibility($"BuyVehicle ({i})", true);
 
-                SetVisibility($"Vehicle ({i})", true);
+                SendVisibility($"Vehicle ({i})", true);
             }
 
             for (; i < MaxItemsPerPage; i++)
             {
-                SetVisibility($"Vehicle ({i})", false);
-                SetVisibility($"BuyVehicle ({i})", false);
-                SetVisibility($"SellVehicle ({i})", false);
+                SendVisibility($"Vehicle ({i})", false);
+                SendVisibility($"BuyVehicle ({i})", false);
+                SendVisibility($"SellVehicle ({i})", false);
             }
 
-            SetVisibility("VehicleBody", true);
+            SendVisibility("VehicleBody", true);
         }
 
         public async UniTask SetTab(UITab tab)
@@ -273,19 +244,19 @@ namespace ShopsUI.UI
             {
                 var tabName = CurrentTab == UITab.Items ? "Item" : "Vehicle";
 
-                SetVisibility($"{tabName}Body", false);
+                SendVisibility($"{tabName}Body", false);
                 for (var i = 0; i < _elementsShown; i++)
                 {
-                    SetVisibility($"{tabName} ({i})", false);
-                    SetVisibility($"Buy{tabName} ({i})", false);
+                    SendVisibility($"{tabName} ({i})", false);
+                    SendVisibility($"Buy{tabName} ({i})", false);
 
                     if (CurrentTab == UITab.Items)
-                        SetVisibility($"Sell{tabName} ({i})", false);
+                        SendVisibility($"Sell{tabName} ({i})", false);
                 }
 
                 if (_currentPage > 0)
-                    SetVisibility("PrevPage", false);
-                SetVisibility("NextPage", false);
+                    SendVisibility("PrevPage", false);
+                SendVisibility("NextPage", false);
 
                 _elementsShown = 0;
             }
@@ -296,12 +267,12 @@ namespace ShopsUI.UI
             if (CurrentTab == UITab.Items)
             {
                 await ShowItemShopPage(0);
-                SetVisibility("ItemBody", true);
+                SendVisibility("ItemBody", true);
             }
             else
             {
                 await ShowVehicleShopPage(0);
-                SetVisibility("VehicleBody", true);
+                SendVisibility("VehicleBody", true);
             }
         }
 
@@ -309,10 +280,10 @@ namespace ShopsUI.UI
         {
             var key = isSuccess ? "AlertSuccessText" : "AlertFailureText";
 
-            SetVisibility("AlertSuccessText", false);
-            SetVisibility("AlertFailureText", false);
-            SetText(key, message);
-            SetVisibility(key, true);
+            SendVisibility("AlertSuccessText", false);
+            SendVisibility("AlertFailureText", false);
+            SendText(key, message);
+            SendVisibility(key, true);
 
             return UniTask.CompletedTask;
         }
