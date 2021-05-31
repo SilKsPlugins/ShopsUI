@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenMod.EntityFrameworkCore;
 using ShopsUI.Database.Models;
+using SilK.OpenMod.EntityFrameworkCore;
 using System;
 
 namespace ShopsUI.Database
 {
-    public class ShopsDbContext : OpenModDbContext<ShopsDbContext>
+    public class ShopsDbContext : OpenModPomeloDbContext<ShopsDbContext>
     {
         public ShopsDbContext(
             DbContextOptions<ShopsDbContext> options,
