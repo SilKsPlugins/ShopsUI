@@ -84,12 +84,14 @@ namespace ShopsUI.Shops.Items
 
             for (var i = 0; i < amount; i++)
             {
-                //var item = await _itemSpawner.GiveItemAsync(user.Player.Inventory, itemAsset);
-                var success = ItemTool.tryForceGiveItem(user.Player.Player, ushort.Parse(itemAsset.ItemAssetId), 1);
+                var itemState = new AdminItemState(itemAsset);
 
-                //if (item == null)
-                if (!success)
+                var item = await _itemSpawner.GiveItemAsync(user.Player.Inventory, itemAsset, itemState);
+
+                if (item == null)
+                {
                     throw new Exception($"Could not give item with id '{itemAsset.ItemAssetId}' to player");
+                }
             }
 
             return balance;
