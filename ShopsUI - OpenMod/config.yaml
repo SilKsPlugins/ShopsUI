@@ -2,6 +2,17 @@ database:
   ConnectionStrings:
     default: "Server=127.0.0.1; Database=openmod; Port=3306; User=unturned; Password=password"
 
+shops:
+  # Blacklists allow all players to access a given shop
+  # unless they have a configured blacklisted permission.
+  # When this setting is set to true, shop blacklists will not be ignored.
+  blacklistEnabled: false
+
+  # Whitelists allow only the players who have a configured
+  # whitelisted permission to access a given shop.
+  # When this setting is set to true, shop whitelists will not be ignored.
+  whitelistEnabled: false
+
 ui:
   logoUrl: "https://i.imgur.com/t6HbFTN.png"
   mainEffect: 29150
