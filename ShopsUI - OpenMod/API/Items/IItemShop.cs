@@ -12,5 +12,7 @@ namespace ShopsUI.API.Items
 
         bool CanSell();
         Task<decimal> Sell(UnturnedUser user, int amount = 1);
+
+        Task<bool> IsPermitted(UnturnedUser user);
     }
 }

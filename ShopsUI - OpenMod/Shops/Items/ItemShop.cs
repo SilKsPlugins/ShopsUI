@@ -1,11 +1,14 @@
 ﻿using Cysharp.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using OpenMod.API;
 using OpenMod.API.Commands;
+using OpenMod.API.Permissions;
 using OpenMod.Extensions.Economy.Abstractions;
 using OpenMod.Extensions.Games.Abstractions.Items;
 using OpenMod.Unturned.Items;
 using OpenMod.Unturned.Users;
-using SDG.Unturned;
 using ShopsUI.API.Items;
 using ShopsUI.Database.Models;
 using System;
@@ -20,34 +23,53 @@ namespace ShopsUI.Shops.Items
         private readonly IItemDirectory _itemDirectory;
         private readonly IItemSpawner _itemSpawner;
         private readonly IStringLocalizer _stringLocalizer;
+        private readonly IPermissionChecker _permissionChecker;
+        private readonly IPermissionRegistry _permissionRegistry;
+        private readonly IConfiguration _configuration;
+        private readonly IOpenModComponent _openModComponent;
+        private readonly ILogger<ItemShop> _logger;
 
-        public IItemShopData ShopData { get; }
+        public ItemShopModel ShopData { get; }
+
+        IItemShopData IItemShop.ShopData => ShopData;
+
+        public const string PermissionFormat = "groups.{0}";
 
         public ItemShop(
             IEconomyProvider economyProvider,
             IItemDirectory itemDirectory,
             IItemSpawner itemSpawner,
             IStringLocalizer stringLocalizer,
+            IPermissionChecker permissionChecker,
+            IPermissionRegistry permissionRegistry,
+            IConfiguration configuration,
+            IOpenModComponent openModComponent,
+            ILogger<ItemShop> logger,
             ItemShopModel itemShopModel)
         {
             _economyProvider = economyProvider;
             _itemDirectory = itemDirectory;
             _itemSpawner = itemSpawner;
             _stringLocalizer = stringLocalizer;
+            _permissionChecker = permissionChecker;
+            _permissionRegistry = permissionRegistry;
+            _configuration = configuration;
+            _openModComponent = openModComponent;
+            _logger = logger;
 
             ShopData = itemShopModel;
         }
 
-        private async Task<IItemAsset> GetItemAsset()
+        private async Task<UnturnedItemAsset> GetItemAsset()
         {
             var id = ShopData.ItemId.ToString();
 
             var itemAsset = await _itemDirectory.FindByIdAsync(id);
 
-            if (itemAsset == null || itemAsset is UnturnedItemAsset unturnedItemAsset && unturnedItemAsset.ItemAsset.isPro)
+            if (itemAsset is not UnturnedItemAsset unturnedItemAsset || unturnedItemAsset.ItemAsset.isPro)
                 throw new Exception($"Item id '{id}' has no asset");
 
-            return itemAsset;
+            return unturnedItemAsset;
         }
 
         private void VerifyAmount(int amount)
@@ -151,6 +173,71 @@ namespace ShopsUI.Shops.Items
                         _economyProvider.CurrencySymbol,
                         _economyProvider.CurrencyName
                     }]);
+        }
+
+        public async Task<bool> IsPermitted(UnturnedUser user)
+        {
+            var blacklistEnabled = _configuration.GetValue("shops:blacklistEnabled", false);
+            var whitelistEnabled = _configuration.GetValue("shops:whitelistEnabled", false);
+
+            if (!blacklistEnabled && !whitelistEnabled) return true;
+
+            var groups = ShopData.AuthGroups.ToList();
+
+            if (groups.Count == 0) return true;
+
+            var blacklistedGroups = groups.Where(x => !x.IsWhitelist).ToList();
+            var whitelistedGroups = groups.Where(x => x.IsWhitelist).ToList();
+
+            if (whitelistEnabled && whitelistedGroups.Count > 0)
+            {
+                if (blacklistEnabled && blacklistedGroups.Count > 0)
+                {
+                    _logger.LogWarning(
+                        $"Item shop with id {ShopData.ItemId} has both a whitelist and a blacklist. Defaulting to using whitelist.");
+                }
+
+                foreach (var group in whitelistedGroups)
+                {
+                    var permission = string.Format(PermissionFormat, group.Permission);
+
+                    if (_permissionRegistry.FindPermission(_openModComponent, permission) == null)
+                    {
+                        _permissionRegistry.RegisterPermission(_openModComponent, permission,
+                            description: "Provides/denies access to a shop.");
+                    }
+
+                    if (await _permissionChecker.CheckPermissionAsync(user, permission) == PermissionGrantResult.Grant)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            if (blacklistEnabled && blacklistedGroups.Count > 0)
+            {
+                foreach (var group in blacklistedGroups)
+                {
+                    var permission = string.Format(PermissionFormat, group.Permission);
+
+                    if (_permissionRegistry.FindPermission(_openModComponent, permission) == null)
+                    {
+                        _permissionRegistry.RegisterPermission(_openModComponent, permission,
+                            description: "Provides/denies access to a shop.");
+                    }
+
+                    if (await _permissionChecker.CheckPermissionAsync(user, permission) == PermissionGrantResult.Grant)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return true;
         }
     }
 }

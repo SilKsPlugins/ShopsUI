@@ -8,5 +8,7 @@ namespace ShopsUI.API.Vehicles
         IVehicleShopData ShopData { get; }
         
         Task<decimal> Buy(UnturnedUser user);
+
+        Task<bool> IsPermitted(UnturnedUser user);
     }
 }
