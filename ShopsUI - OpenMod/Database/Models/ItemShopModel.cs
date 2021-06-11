@@ -1,5 +1,6 @@
 ﻿using ShopsUI.API.Items;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,6 +19,8 @@ namespace ShopsUI.Database.Models
         public decimal? SellPrice { get; set; }
         
         public int Order { get; set; }
+
+        public virtual ICollection<ItemGroupModel> AuthGroups { get; set; } = new List<ItemGroupModel>();
 
         public ItemShopModel()
         {
