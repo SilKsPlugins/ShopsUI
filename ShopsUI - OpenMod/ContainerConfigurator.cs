@@ -1,15 +1,15 @@
-﻿using OpenMod.API.Plugins;
-using OpenMod.EntityFrameworkCore.Extensions;
-using ShopsUI.Database;
+﻿using Autofac;
+using OpenMod.API.Ioc;
+using SilK.OpenMod.EntityFrameworkCore;
 
 namespace ShopsUI
 {
-    public class ContainerConfigurator : IPluginContainerConfigurator
+    public class ContainerConfigurator : IContainerConfigurator
     {
-        public void ConfigureContainer(IPluginServiceConfigurationContext context)
+        public void ConfigureContainer(IOpenModServiceConfigurationContext openModStartupContext,
+            ContainerBuilder containerBuilder)
         {
-            context.ContainerBuilder.AddEntityFrameworkCoreMySql();
-            context.ContainerBuilder.AddDbContext<ShopsDbContext>();
+            containerBuilder.AddPomeloMySqlConnectorResolver();
         }
     }
 }
