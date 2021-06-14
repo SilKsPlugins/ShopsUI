@@ -47,9 +47,15 @@
     </None>
   </ItemGroup>
 
-  <Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
-    <ItemGroup>
-    </ItemGroup>
-  </Target>
+	<Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+		<ItemGroup>
+			<ReferencePath Condition="'%(FileName)' == 'JetBrains.Annotations'">
+				<Aliases>JetBrainsAnnotations</Aliases>
+			</ReferencePath>
+			<ReferencePath Condition="'%(FileName)' == 'MySqlConnector'">
+				<Aliases>MySqlConnectorAnnotations</Aliases>
+			</ReferencePath>
+		</ItemGroup>
+	</Target>
 
 </Project>
