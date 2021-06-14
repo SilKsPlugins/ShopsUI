@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using OpenMod.API;
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
@@ -21,11 +22,14 @@ namespace ShopsUI.Commands.Items
     public class CShop : UnturnedCommand
     {
         private readonly IUIManager _uiManager;
+        private readonly IOpenModComponent _openModComponent;
 
         public CShop(IUIManager uiManager,
+            IOpenModComponent openModComponent,
             IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _uiManager = uiManager;
+            _openModComponent = openModComponent;
         }
 
         protected override async UniTask OnExecuteAsync()
@@ -35,7 +39,8 @@ namespace ShopsUI.Commands.Items
             if (Context.Actor is not UnturnedUser user)
                 throw new UserFriendlyException("This command can only be called by a player");
 
-            var session = await _uiManager.StartSession<ShopsUISession>(user);
+            var session =
+                await _uiManager.StartSession<ShopsUISession>(user, lifetimeScope: _openModComponent.LifetimeScope);
 
             await session.SetTab(UITab.Items);
         }

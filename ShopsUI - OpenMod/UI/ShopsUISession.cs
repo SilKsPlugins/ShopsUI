@@ -1,12 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using OpenMod.API.Commands;
 using OpenMod.Extensions.Economy.Abstractions;
 using OpenMod.Extensions.Games.Abstractions.Items;
 using OpenMod.Extensions.Games.Abstractions.Vehicles;
 using OpenMod.Unturned.Users;
-using SDG.Unturned;
 using ShopsUI.API;
 using ShopsUI.API.UI;
 using SilK.Unturned.Extras.UI;
@@ -23,8 +23,7 @@ namespace ShopsUI.UI
         private readonly IShopManager _shopManager;
         private readonly IItemDirectory _itemDirectory;
         private readonly IVehicleDirectory _vehicleDirectory;
-
-        private bool _isDisposing;
+        private readonly ILogger<ShopsUISession> _logger;
 
         private int _currentPage;
         private int _elementsShown;
@@ -47,6 +46,7 @@ namespace ShopsUI.UI
             IShopManager shopManager,
             IItemDirectory itemDirectory,
             IVehicleDirectory vehicleDirectory,
+            ILogger<ShopsUISession> logger,
             IServiceProvider serviceProvider) : base(user, serviceProvider)
         {
             _configuration = configuration;
@@ -55,6 +55,7 @@ namespace ShopsUI.UI
             _shopManager = shopManager;
             _itemDirectory = itemDirectory;
             _vehicleDirectory = vehicleDirectory;
+            _logger = logger;
 
             _currentPage = -1;
             _elementsShown = 0;
@@ -70,7 +71,6 @@ namespace ShopsUI.UI
             await UniTask.SwitchToMainThread();
 
             CurrentTab = UITab.None;
-
 
             await SetCursor(true);
 
@@ -91,11 +91,17 @@ namespace ShopsUI.UI
             {
                 SendImage("ShopLogo", logoUrl!);
             }
+
+
         }
 
-        public async UniTask EndSession()
+        protected override async UniTask OnEndAsync()
         {
+            await UniTask.Delay(350);
+
             await UniTask.SwitchToMainThread();
+            
+            await SetCursor(false);
 
             ClearEffect();
         }
@@ -308,57 +314,58 @@ namespace ShopsUI.UI
 
         private bool _processingButtonClick;
 
-        public async UniTask OnButtonClicked(string buttonName)
+        protected override async UniTask ButtonClickedAsync(string buttonName)
         {
             if (_processingButtonClick) return;
             _processingButtonClick = true;
 
-            switch (buttonName)
-            {
-                case "ExitButton":
-                    User.Player.Player.setPluginWidgetFlag(
-                        EPluginWidgetFlags.Modal | EPluginWidgetFlags.ForceBlur, false);
-
-                    await UniTask.Delay(350);
-
-                    await EndSession();
-                    break;
-
-                case "ItemShops":
-                    await SetTab(UITab.Items);
-                    break;
-
-                case "VehicleShops":
-                    await SetTab(UITab.Vehicles);
-                    break;
-
-                case "NextPage":
-                    if (CurrentTab == UITab.Items)
-                    {
-                        await ShowItemShopPage(_currentPage + 1);
-                    }
-                    else if (CurrentTab == UITab.Vehicles)
-                    {
-                        await ShowVehicleShopPage(_currentPage + 1);
-                    }
-                    break;
-
-                case "PrevPage":
-                    if (CurrentTab == UITab.Items)
-                    {
-                        if (_currentPage > 0)
-                            await ShowItemShopPage(_currentPage - 1);
-                    }
-                    else if (CurrentTab == UITab.Vehicles)
-                    {
-                        if (_currentPage > 0)
-                            await ShowVehicleShopPage(_currentPage - 1);
-                    }
-                    break;
-            }
+            _logger.LogInformation($"Clicked: {buttonName}");
 
             try
             {
+                await UniTask.SwitchToThreadPool();
+
+                switch (buttonName)
+                {
+                    case "ExitButton":
+                        await EndAsync();
+                        break;
+
+                    case "ItemShops":
+                        await SetTab(UITab.Items);
+                        break;
+
+                    case "VehicleShops":
+                        await SetTab(UITab.Vehicles);
+                        break;
+
+                    case "NextPage":
+                        if (CurrentTab == UITab.Items)
+                        {
+                            await ShowItemShopPage(_currentPage + 1);
+                        }
+                        else if (CurrentTab == UITab.Vehicles)
+                        {
+                            await ShowVehicleShopPage(_currentPage + 1);
+                        }
+
+                        break;
+
+                    case "PrevPage":
+                        if (CurrentTab == UITab.Items)
+                        {
+                            if (_currentPage > 0)
+                                await ShowItemShopPage(_currentPage - 1);
+                        }
+                        else if (CurrentTab == UITab.Vehicles)
+                        {
+                            if (_currentPage > 0)
+                                await ShowVehicleShopPage(_currentPage - 1);
+                        }
+
+                        break;
+                }
+
                 if (TryGetIndex("BuyItem (", buttonName, out var index))
                 {
                     if (CurrentTab == UITab.Items && index < _elementsShown)
@@ -367,11 +374,18 @@ namespace ShopsUI.UI
 
                         if (shop != null && shop.CanBuy())
                         {
-                            var balance = await shop.Buy(User);
+                            if (!await shop.IsPermitted(User))
+                            {
+                                await ShowAlert(_stringLocalizer["ui:items:not_permitted"], false);
+                            }
+                            else
+                            {
+                                var balance = await shop.Buy(User);
 
-                            await ShowBalance(balance);
+                                await ShowBalance(balance);
 
-                            await ShowAlert(_stringLocalizer["ui:items:bought"], true);
+                                await ShowAlert(_stringLocalizer["ui:items:bought"], true);
+                            }
                         }
                     }
                 }
@@ -383,11 +397,18 @@ namespace ShopsUI.UI
 
                         if (shop != null && shop.CanSell())
                         {
-                            var balance = await shop.Sell(User);
+                            if (!await shop.IsPermitted(User))
+                            {
+                                await ShowAlert(_stringLocalizer["ui:items:not_permitted"], false);
+                            }
+                            else
+                            {
+                                var balance = await shop.Sell(User);
 
-                            await ShowBalance(balance);
+                                await ShowBalance(balance);
 
-                            await ShowAlert(_stringLocalizer["ui:items:sold"], true);
+                                await ShowAlert(_stringLocalizer["ui:items:sold"], true);
+                            }
                         }
                     }
                 }
@@ -399,11 +420,18 @@ namespace ShopsUI.UI
 
                         if (shop != null)
                         {
-                            var balance = await shop.Buy(User);
+                            if (!await shop.IsPermitted(User))
+                            {
+                                await ShowAlert(_stringLocalizer["ui:vehicles:not_permitted"], false);
+                            }
+                            else
+                            {
+                                var balance = await shop.Buy(User);
 
-                            await ShowBalance(balance);
+                                await ShowBalance(balance);
 
-                            await EndSession();
+                                await EndAsync();
+                            }
                         }
                     }
                 }
@@ -412,8 +440,10 @@ namespace ShopsUI.UI
             {
                 await ShowAlert(ex.Message, false);
             }
-
-            _processingButtonClick = false;
+            finally
+            {
+                _processingButtonClick = false;
+            }
         }
     }
 }
