@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShopsUI.Database.Models
 {
-    [Table("ItemGroup")]
+    [Serializable]
     public class ItemGroupModel
     {
         [Key]
@@ -14,14 +15,13 @@ namespace ShopsUI.Database.Models
 
         public bool IsWhitelist { get; set; }
 
-        public virtual ItemShopModel ItemShop { get; }
+        public virtual ItemShopModel ItemShop { get; set; } = null!;
 
         public ItemGroupModel()
         {
             Id = 0;
             Permission = "";
             IsWhitelist = true;
-            ItemShop = null!;
         }
     }
 }

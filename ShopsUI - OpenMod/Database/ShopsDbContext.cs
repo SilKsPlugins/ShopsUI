@@ -13,9 +13,13 @@ namespace ShopsUI.Database
         {
         }
 
-        public DbSet<ItemShopModel> ItemShops { get; set; } = null!;
+        public DbSet<ItemShopModel> ItemShops => Set<ItemShopModel>();
 
-        public DbSet<VehicleShopModel> VehicleShops { get; set; } = null!;
+        public DbSet<VehicleShopModel> VehicleShops => Set<VehicleShopModel>();
+
+        public DbSet<ItemGroupModel> ItemGroups => Set<ItemGroupModel>();
+
+        public DbSet<VehicleGroupModel> VehicleGroups => Set<VehicleGroupModel>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +40,14 @@ namespace ShopsUI.Database
                 .HasMany(x => x.AuthGroups)
                 .WithOne(x => x.VehicleShop)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ItemGroupModel>()
+                .Property(x => x.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<VehicleGroupModel>()
+                .Property(x => x.Id)
+                .ValueGeneratedOnAdd();
         }
     }
 }
