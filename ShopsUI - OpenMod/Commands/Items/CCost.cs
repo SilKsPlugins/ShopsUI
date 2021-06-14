@@ -24,13 +24,19 @@ namespace ShopsUI.Commands.Items
             var asset = await GetItemAsset(0);
             var amount = await GetAmount(1);
 
-            var shop = await ShopManager.GetItemShopData(ushort.Parse(asset.ItemAssetId));
+            var shop = await ShopManager.GetItemShop(ushort.Parse(asset.ItemAssetId));
 
-            if (shop == null || shop.BuyPrice == null && shop.SellPrice == null)
+            if (shop == null || !shop.CanBuy() && !shop.CanSell())
                 throw new UserFriendlyException(
                     StringLocalizer["commands:errors:no_item_shop", new {ItemAsset = asset}]);
 
-            if (shop.BuyPrice != null && shop.SellPrice != null)
+            if (!await shop.IsPermitted(Context.Actor))
+            {
+                throw new UserFriendlyException(StringLocalizer["commands:errors:not_permitted_item",
+                    new { ItemAsset = asset }]);
+            }
+
+            if (shop.CanBuy() && shop.CanSell())
             {
                 // Buy and sell
                 await PrintAsync(StringLocalizer["commands:success:item_cost:buy_and_sell",
@@ -38,13 +44,13 @@ namespace ShopsUI.Commands.Items
                     {
                         ItemAsset = asset,
                         Amount = amount,
-                        BuyPrice = shop.BuyPrice * amount,
-                        SellPrice = shop.SellPrice * amount,
+                        BuyPrice = shop.ShopData.BuyPrice * amount,
+                        SellPrice = shop.ShopData.SellPrice * amount,
                         EconomyProvider.CurrencySymbol,
                         EconomyProvider.CurrencyName
                     }]);
             }
-            else if (shop.BuyPrice != null)
+            else if (shop.CanBuy())
             {
                 // Buy
                 await PrintAsync(StringLocalizer["commands:success:item_cost:buy",
@@ -52,7 +58,7 @@ namespace ShopsUI.Commands.Items
                     {
                         ItemAsset = asset,
                         Amount = amount,
-                        BuyPrice = shop.BuyPrice * amount,
+                        BuyPrice = shop.ShopData.BuyPrice * amount,
                         EconomyProvider.CurrencySymbol,
                         EconomyProvider.CurrencyName
                     }]);
@@ -65,7 +71,7 @@ namespace ShopsUI.Commands.Items
                     {
                         ItemAsset = asset,
                         Amount = amount,
-                        SellPrice = shop.SellPrice * amount,
+                        SellPrice = shop.ShopData.SellPrice * amount,
                         EconomyProvider.CurrencySymbol,
                         EconomyProvider.CurrencyName
                     }]);

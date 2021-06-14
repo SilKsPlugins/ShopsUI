@@ -28,6 +28,12 @@ namespace ShopsUI.Commands.Vehicles
                        ?? throw new UserFriendlyException(
                            StringLocalizer["commands:errors:no_buyable_vehicle_shop", new { VehicleAsset = asset }]);
 
+            if (!await shop.IsPermitted(Context.Actor))
+            {
+                throw new UserFriendlyException(StringLocalizer["commands:errors:not_permitted_vehicle",
+                    new { VehicleAsset = asset }]);
+            }
+
             var balance = await shop.Buy(GetUnturnedUser());
 
             await PrintAsync(StringLocalizer["commands:success:vehicle_bought",

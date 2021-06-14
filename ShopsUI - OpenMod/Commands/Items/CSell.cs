@@ -32,6 +32,12 @@ namespace ShopsUI.Commands.Items
                 throw new UserFriendlyException(
                     StringLocalizer["commands:errors:no_sellable_item_shop", new { ItemAsset = asset }]);
 
+            if (!await shop.IsPermitted(Context.Actor))
+            {
+                throw new UserFriendlyException(StringLocalizer["commands:errors:not_permitted_item",
+                    new { ItemAsset = asset }]);
+            }
+
             var balance = await shop.Sell(GetUnturnedUser(), amount);
 
             await PrintAsync(StringLocalizer["commands:success:item_sold",
