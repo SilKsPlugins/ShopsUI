@@ -47,7 +47,7 @@ namespace ShopsUI.Commands
 
             public string VehicleShopTableName { get; set; } = "uconomyvehicleshop";
 
-            public string GroupListTableName { get; set; } = "zaupshopgroups";
+            public string? GroupListTableName { get; set; } = null;
         }
 
         private readonly ShopsDbContext _dbContext;
@@ -199,6 +199,8 @@ namespace ShopsUI.Commands
             var zaupShopConfig =
                 await GetPluginConfig<ZaupShopConfiguration>("/Rocket/Plugins/ZaupShop/ZaupShop.configuration.xml");
 
+            var migrateGroups = !string.IsNullOrEmpty(zaupShopConfig.GroupListTableName);
+
             var connectionString =
                 $"Server={uconomyConfig.DatabaseAddress};" +
                 $"Port={(uconomyConfig.DatabasePort == 0 ? 3306 : uconomyConfig.DatabasePort)};" +
@@ -214,14 +216,21 @@ namespace ShopsUI.Commands
 
             await MigrateVehicleShops(connection, zaupShopConfig);
 
-            await MigrateGroups(connection, zaupShopConfig);
+            if (migrateGroups)
+            {
+                await MigrateGroups(connection, zaupShopConfig);
+            }
 
             await connection.CloseAsync();
 
             var entries = await _dbContext.SaveChangesAsync();
 
             await PrintAsync($"Successfully migrated and written {entries} new entries to the database.");
-            await PrintAsync("Make sure to replace your zaupgroup.XXX permissions with ShopsUI:groups.XXX");
+
+            if (migrateGroups)
+            {
+                await PrintAsync("Make sure to replace your zaupgroup.XXX permissions with ShopsUI:groups.XXX");
+            }
         }
     }
 }
