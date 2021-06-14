@@ -29,12 +29,20 @@ namespace ShopsUI.Database
                 .HasKey(x => x.ItemId);
 
             modelBuilder.Entity<ItemShopModel>()
+                .Property(x => x.ItemId)
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<ItemShopModel>()
                 .HasMany(x => x.AuthGroups)
                 .WithOne(x => x.ItemShop)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<VehicleShopModel>()
                 .HasKey(x => x.VehicleId);
+
+            modelBuilder.Entity<VehicleShopModel>()
+                .Property(x => x.VehicleId)
+                .ValueGeneratedNever();
 
             modelBuilder.Entity<VehicleShopModel>()
                 .HasMany(x => x.AuthGroups)
