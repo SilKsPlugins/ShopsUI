@@ -35,6 +35,7 @@ namespace ShopsUI.Shops
             Func<IQueryable<IItemShopData>, IQueryable<IItemShopData>> query)
         {
             var queryable = _dbContext.ItemShops
+                .Include(x => x.AuthGroups)
                 .OrderByDescending(x => x.Order)
                 .ThenBy(x => x.ItemId);
 
@@ -45,6 +46,7 @@ namespace ShopsUI.Shops
             Func<IQueryable<IVehicleShopData>, IQueryable<IVehicleShopData>> query)
         {
             var queryable = _dbContext.VehicleShops
+                .Include(x => x.AuthGroups)
                 .OrderByDescending(x => x.Order)
                 .ThenBy(x => x.VehicleId);
 
@@ -53,7 +55,8 @@ namespace ShopsUI.Shops
 
         public async Task<ItemShopModel?> GetItemShopData(ushort id)
         {
-            return await _dbContext.ItemShops.FindAsync((int) id);
+            return await _dbContext.ItemShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.ItemId == id);
         }
 
         async Task<IItemShopData?> IShopManager.GetItemShopData(ushort id) =>
@@ -61,7 +64,8 @@ namespace ShopsUI.Shops
 
         public async Task<VehicleShopModel?> GetVehicleShopData(ushort id)
         {
-            return await _dbContext.VehicleShops.FindAsync((int) id);
+            return await _dbContext.VehicleShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.VehicleId == id);
         }
 
         async Task<IVehicleShopData?> IShopManager.GetVehicleShopData(ushort id) =>
@@ -87,7 +91,8 @@ namespace ShopsUI.Shops
         
         public async Task<IItemShop> AddItemShopBuyable(ushort id, decimal price)
         {
-            var data = await _dbContext.ItemShops.FindAsync(id);
+            var data = await _dbContext.ItemShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.ItemId == id);
 
             if (data == null)
             {
@@ -113,7 +118,8 @@ namespace ShopsUI.Shops
 
         public async Task<IItemShop> AddItemShopSellable(ushort id, decimal price)
         {
-            var data = await _dbContext.ItemShops.FindAsync(id);
+            var data = await _dbContext.ItemShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.ItemId == id);
 
             if (data == null)
             {
@@ -139,7 +145,8 @@ namespace ShopsUI.Shops
 
         public async Task<IVehicleShop> AddVehicleShopBuyable(ushort id, decimal price)
         {
-            var data = await _dbContext.VehicleShops.FindAsync(id);
+            var data = await _dbContext.VehicleShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.VehicleId == id);
 
             if (data == null)
             {
@@ -165,7 +172,7 @@ namespace ShopsUI.Shops
 
         public async Task<bool> RemoveItemShopBuyable(ushort id)
         {
-            var data = await _dbContext.ItemShops.FindAsync((int)id);
+            var data = await _dbContext.ItemShops.FindAsync(id);
 
             if (data?.BuyPrice == null) return false;
 
@@ -187,7 +194,7 @@ namespace ShopsUI.Shops
 
         public async Task<bool> RemoveItemShopSellable(ushort id)
         {
-            var data = await _dbContext.ItemShops.FindAsync((int)id);
+            var data = await _dbContext.ItemShops.FindAsync(id);
 
             if (data?.SellPrice == null) return false;
 
@@ -209,11 +216,189 @@ namespace ShopsUI.Shops
 
         public async Task<bool> RemoveVehicleShopBuyable(ushort id)
         {
-            var data = await _dbContext.VehicleShops.FindAsync((int)id);
+            var data = await _dbContext.VehicleShops.FindAsync(id);
 
             if (data == null) return false;
 
             _dbContext.VehicleShops.Remove(data);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> AddItemWhitelist(ushort id, string permission)
+        {
+            var data = await _dbContext.ItemShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.ItemId == id);
+
+            if (data == null)
+            {
+                return false;
+            }
+
+            if (data.AuthGroups.Any(x => x.IsWhitelist && x.Permission == permission))
+            {
+                return false;
+            }
+
+            await _dbContext.ItemGroups.AddAsync(new ItemGroupModel
+            {
+                Id = id,
+                Permission = permission,
+                IsWhitelist = true,
+                ItemShop = data
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveItemWhitelist(ushort id, string permission)
+        {
+            var group = await _dbContext.ItemGroups.FirstOrDefaultAsync(x => x.Id == id && x.Permission == permission && x.IsWhitelist);
+
+            if (group == null)
+            {
+                return false;
+            }
+
+            _dbContext.ItemGroups.Remove(group);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+
+        public async Task<bool> AddItemBlacklist(ushort id, string permission)
+        {
+            var data = await _dbContext.ItemShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.ItemId == id);
+
+            if (data == null)
+            {
+                return false;
+            }
+
+            if (data.AuthGroups.Any(x => !x.IsWhitelist && x.Permission == permission))
+            {
+                return false;
+            }
+
+            await _dbContext.ItemGroups.AddAsync(new ItemGroupModel
+            {
+                Id = id,
+                Permission = permission,
+                IsWhitelist = false,
+                ItemShop = data
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveItemBlacklist(ushort id, string permission)
+        {
+            var group = await _dbContext.ItemGroups.FirstOrDefaultAsync(x => x.Id == id && x.Permission == permission && !x.IsWhitelist);
+
+            if (group == null)
+            {
+                return false;
+            }
+
+            _dbContext.ItemGroups.Remove(group);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> AddVehicleWhitelist(ushort id, string permission)
+        {
+            var data = await _dbContext.VehicleShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.VehicleId == id);
+
+            if (data == null)
+            {
+                return false;
+            }
+
+            if (data.AuthGroups.Any(x => x.IsWhitelist && x.Permission == permission))
+            {
+                return false;
+            }
+
+            await _dbContext.VehicleGroups.AddAsync(new VehicleGroupModel
+            {
+                Id = id,
+                Permission = permission,
+                IsWhitelist = true,
+                VehicleShop = data
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveVehicleWhitelist(ushort id, string permission)
+        {
+            var group = await _dbContext.VehicleGroups.FirstOrDefaultAsync(x => x.Id == id && x.Permission == permission && x.IsWhitelist);
+
+            if (group == null)
+            {
+                return false;
+            }
+
+            _dbContext.VehicleGroups.Remove(group);
+            
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+
+        public async Task<bool> AddVehicleBlacklist(ushort id, string permission)
+        {
+            var data = await _dbContext.VehicleShops.Include(x => x.AuthGroups)
+                .FirstOrDefaultAsync(x => x.VehicleId == id);
+
+            if (data == null)
+            {
+                return false;
+            }
+
+            if (data.AuthGroups.Any(x => !x.IsWhitelist && x.Permission == permission))
+            {
+                return false;
+            }
+
+            await _dbContext.VehicleGroups.AddAsync(new VehicleGroupModel
+            {
+                Id = id,
+                Permission = permission,
+                IsWhitelist = false,
+                VehicleShop = data
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveVehicleBlacklist(ushort id, string permission)
+        {
+            var group = await _dbContext.VehicleGroups.FirstOrDefaultAsync(x => x.Id == id && x.Permission == permission && !x.IsWhitelist);
+
+            if (group == null)
+            {
+                return false;
+            }
+
+            _dbContext.VehicleGroups.Remove(group);
 
             await _dbContext.SaveChangesAsync();
 

@@ -91,7 +91,7 @@ namespace ShopsUI.Shops.Vehicles
             return balance;
         }
 
-        public async Task<bool> IsPermitted(UnturnedUser user)
+        public async Task<bool> IsPermitted(IPermissionActor user)
         {
             var blacklistEnabled = _configuration.GetValue("shops:blacklistEnabled", false);
             var whitelistEnabled = _configuration.GetValue("shops:whitelistEnabled", false);

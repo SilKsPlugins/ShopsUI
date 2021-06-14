@@ -1,4 +1,5 @@
-﻿using OpenMod.Unturned.Users;
+﻿using OpenMod.API.Permissions;
+using OpenMod.Unturned.Users;
 using System.Threading.Tasks;
 
 namespace ShopsUI.API.Vehicles
@@ -9,6 +10,6 @@ namespace ShopsUI.API.Vehicles
         
         Task<decimal> Buy(UnturnedUser user);
 
-        Task<bool> IsPermitted(UnturnedUser user);
+        Task<bool> IsPermitted(IPermissionActor user);
     }
 }

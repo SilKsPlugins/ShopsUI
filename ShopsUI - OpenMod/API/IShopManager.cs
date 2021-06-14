@@ -30,5 +30,17 @@ namespace ShopsUI.API
         Task<bool> RemoveItemShopBuyable(ushort id);
         Task<bool> RemoveItemShopSellable(ushort id);
         Task<bool> RemoveVehicleShopBuyable(ushort id);
+
+        Task<bool> AddItemWhitelist(ushort id, string permission);
+        Task<bool> RemoveItemWhitelist(ushort id, string permission);
+
+        Task<bool> AddItemBlacklist(ushort id, string permission);
+        Task<bool> RemoveItemBlacklist(ushort id, string permission);
+
+        Task<bool> AddVehicleWhitelist(ushort id, string permission);
+        Task<bool> RemoveVehicleWhitelist(ushort id, string permission);
+
+        Task<bool> AddVehicleBlacklist(ushort id, string permission);
+        Task<bool> RemoveVehicleBlacklist(ushort id, string permission);
     }
 }
