@@ -23,6 +23,7 @@ Shop whitelists/blacklists are supported. The permission you specify in the comm
 **Commands for shop management:**
 
 Basic commands:
+
 - `/shop add <buy | sell> <item> <price>` - Adds the item to the shop to be bought or sold.
 - `/shop remove <buy | sell> <item>` - Removes the buyable/sellable item from the shop.
 - `/vshop add <vehicle> <price>` - Adds the vehicle to the shop to be bought.
@@ -30,10 +31,12 @@ Basic commands:
 - `/shop reload` - Reloads the shops from the database.
 
 UI-related management commands:
+
 - `/shop order <item> <order>` - Sets the order of items in the shop UI.
 - `/vshop order <vehicles> <order>` - Sets the order of vehicles in the shop UI.
 
 Whitelist/blacklist commands:
+
 - `/shop whitelist <add | rem> <item> <permission>` - Manage item shop whitelists.
 - `/shop blacklist <add | rem> <item> <permission>` - Manage item shop blacklists.
 - `/vshop whitelist <add | rem> <vehicle> <permission>` - Manage vehicle shop whitelists.
@@ -46,6 +49,31 @@ The permission you specify has `ShopsUI:groups.` added to the front of it. `abc`
 - `/buy <item> [amount]` - Buys the item from the shop.
 - `/sell <item> [amount]` - Sells the item to the shop.
 - `/vbuy <vehicle>` - Buys the vehicle from the shop.
+
+### Configuration
+```
+database:
+  ConnectionStrings:
+    default: "Server=127.0.0.1; Database=openmod; Port=3306; User=unturned; Password=password"
+
+shops:
+  # Blacklists allow all players to access a given shop
+  # unless they have a configured blacklisted permission.
+  # When this setting is set to true, shop blacklists will not be ignored.
+  blacklistEnabled: false
+
+  # Whitelists allow only the players who have a configured
+  # whitelisted permission to access a given shop.
+  # When this setting is set to true, shop whitelists will not be ignored.
+  whitelistEnabled: false
+
+ui:
+  logoUrl: "https://i.imgur.com/t6HbFTN.png"
+  mainEffect: 29150
+```
+
+### Translations
+Available at https://pastebin.com/raw/1PaiSqtT
 
 ### Installation
 
