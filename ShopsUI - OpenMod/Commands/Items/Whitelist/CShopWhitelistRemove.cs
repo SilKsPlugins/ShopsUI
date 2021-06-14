@@ -11,6 +11,7 @@ namespace ShopsUI.Commands.Items.Whitelist
     [CommandAlias("r")]
     [CommandAlias("-")]
     [CommandSyntax("<item> <permission>")]
+    [CommandDescription("Remove an item shop whitelist.")]
     [CommandParent(typeof(CShopWhitelist))]
     public class CShopWhitelistRemove : ShopCommand
     {

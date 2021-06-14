@@ -10,6 +10,7 @@ namespace ShopsUI.Commands.Items.Blacklist
     [CommandAlias("a")]
     [CommandAlias("+")]
     [CommandSyntax("<item> <permission>")]
+    [CommandDescription("Add an item shop blacklist.")]
     [CommandParent(typeof(CShopBlacklist))]
     public class CShopBlacklistAdd : ShopCommand
     {

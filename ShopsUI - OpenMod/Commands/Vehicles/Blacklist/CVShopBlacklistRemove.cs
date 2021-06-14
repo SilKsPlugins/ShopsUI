@@ -11,6 +11,7 @@ namespace ShopsUI.Commands.Vehicles.Blacklist
     [CommandAlias("r")]
     [CommandAlias("-")]
     [CommandSyntax("<vehicle> <permission>")]
+    [CommandDescription("Remove a vehicle shop blacklist.")]
     [CommandParent(typeof(CVShopBlacklist))]
     public class CVShopBlacklistRemove : ShopCommand
     {

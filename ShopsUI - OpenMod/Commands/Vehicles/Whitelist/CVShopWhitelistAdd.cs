@@ -10,6 +10,7 @@ namespace ShopsUI.Commands.Vehicles.Whitelist
     [CommandAlias("a")]
     [CommandAlias("+")]
     [CommandSyntax("<vehicle> <permission>")]
+    [CommandDescription("Add a vehicle shop whitelist.")]
     [CommandParent(typeof(CVShopWhitelist))]
     public class CVShopWhitelistAdd : ShopCommand
     {

@@ -9,6 +9,7 @@ namespace ShopsUI.Commands.Vehicles.Whitelist
     [Command("whitelist", Priority = Priority.High)]
     [CommandAlias("wl")]
     [CommandSyntax("<add | rem> <vehicle> <permission>")]
+    [CommandDescription("Manage vehicle shop whitelists.")]
     [CommandParent(typeof(CVShop))]
     public class CVShopWhitelist : UnturnedCommand
     {

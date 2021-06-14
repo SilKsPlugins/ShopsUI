@@ -9,6 +9,7 @@ namespace ShopsUI.Commands.Vehicles.Blacklist
     [Command("blacklist", Priority = Priority.High)]
     [CommandAlias("bl")]
     [CommandSyntax("<add | rem> <vehicle> <permission>")]
+    [CommandDescription("Manage vehicle shop blacklists.")]
     [CommandParent(typeof(CVShop))]
     public class CVShopBlacklist : UnturnedCommand
     {
