@@ -15,6 +15,8 @@ namespace ShopsUI.Database.Models
 
         public bool IsWhitelist { get; set; }
 
+        public ushort VehicleShopVehicleId { get; set; }
+
         public virtual VehicleShopModel VehicleShop { get; set; } = null!;
 
         public VehicleGroupModel()

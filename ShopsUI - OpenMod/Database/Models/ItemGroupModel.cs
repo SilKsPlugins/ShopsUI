@@ -15,6 +15,8 @@ namespace ShopsUI.Database.Models
 
         public bool IsWhitelist { get; set; }
 
+        public ushort ItemShopItemId { get; set; }
+
         public virtual ItemShopModel ItemShop { get; set; } = null!;
 
         public ItemGroupModel()
