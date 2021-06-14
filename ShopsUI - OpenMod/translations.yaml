@@ -21,6 +21,20 @@ commands:
     shop_order:
       item: "Successfuly set order value of {ItemAsset.ItemName} to {Order}."
       vehicle: "Successfuly set order value of {VehicleAsset.VehicleName} to {Order}."
+    shop_whitelist:
+      added:
+        item: "Successfully added whitelist for item {ItemAsset.ItemAssetId} with permission {Permission}."
+        vehicle: "Successfully added whitelist for vehicle {VehicleAsset.VehicleAssetId} with permission {Permission}."
+      removed:
+        item: "Successfully removed whitelist for item {ItemAsset.ItemAssetId} with permission {Permission}."
+        vehicle: "Successfully removed whitelist for vehicle {VehicleAsset.VehicleAssetId} with permission {Permission}."
+    shop_blacklist:
+      added:
+        item: "Successfully added blacklist for item {ItemAsset.ItemAssetId} with permission {Permission}."
+        vehicle: "Successfully added blacklist for vehicle {VehicleAsset.VehicleAssetId} with permission {Permission}."
+      removed:
+        item: "Successfully removed blacklist for item {ItemAsset.ItemAssetId} with permission {Permission}."
+        vehicle: "Successfully removed blacklist for vehicle {VehicleAsset.VehicleAssetId} with permission {Permission}."
   errors:
     invalid_item_id: "Given item id ({IdOrName}) does not exist."
     invalid_vehicle_id: "Given vehicle id ({IdOrName}) does not exist."
@@ -32,6 +46,22 @@ commands:
     no_sellable_item_shop: "The item {ItemAsset.ItemName} cannot be sold."
     no_vehicle_shop: "No shop for {VehicleAsset.VehicleName} exists."
     no_buyable_vehicle_shop: "The vehicle {VehicleAsset.VehicleName} cannot be bought."
+    not_permitted_item: "You are not permitted to buy/sell {ItemAsset.ItemName}."
+    not_permitted_vehicle: "You are not permitted to buy {VehicleAsset.VehicleName}."
+    shop_whitelist:
+      added:
+        item: "A whitelist for this item could not be added. This shop may not exist or the whitelist has already been added."
+        vehicle: "A whitelist for this vehicle could not be added. This shop may not exist or the whitelist has already been added."
+      removed:
+        item: "A whitelist for this item could not be removed. This shop may not exist or the whitelist has already been removed."
+        vehicle: "A whitelist for this vehicle could not be removed. This shop may not exist or the whitelist has already been removed."
+    shop_blacklist:
+      added:
+        item: "A blacklist for this item could not be added. This shop may not exist or the blacklist has already been added."
+        vehicle: "A blacklist for this vehicle could not be added. This shop may not exist or the blacklist has already been added."
+      removed:
+        item: "A blacklist for this item could not be removed. This shop may not exist or the blacklist has already been removed."
+        vehicle: "A blacklist for this vehicle could not be removed. This shop may not exist or the blacklist has already been removed."
 
 transactions:
   items:
@@ -51,8 +81,10 @@ ui:
       sell: "Sell for {CurrencySymbol}{SellPrice:0.##}"
     bought: "Successfully purchased."
     sold: "Successfully sold."
+    not_permitted: "You are not permitted to do this."
   vehicles:
     header: "Vehicles"
     listing:
       content: "{VehicleAsset.VehicleName}"
       buy: "Buy for {CurrencySymbol}{BuyPrice:0.##}"
+    not_permitted: "You are not permitted to do this."
