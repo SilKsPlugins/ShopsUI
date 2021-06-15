@@ -4,6 +4,8 @@ Using this plugin, players can buy and sell items and vehicles in your server's 
 
 *This plugin is made for [OpenMod](https://openmod.github.io/openmod-docs/), the successor of RocketMod. OpenMod supports all RocketMod plugins. [Migrate to OpenMod now](https://openmod.github.io/openmod-docs/user-guide/installation/unturned/). Feel free to ask questions in the [OpenMod Discord](https://discord.gg/6yy7gxk).*
 
+Easily migrate from your existing ZaupShops installation using the migration command. See more in the **Migration** section.
+
 ### Usage
 
 Players can simply use /shop (or /vshop to directly access the vehicle shop).
@@ -12,6 +14,16 @@ See the media on this page to view an example of the UI.
 At the moment, commands must be used to configure the shop. More info on configuring the shops can be found in the **Commands** section.
 
 Shop whitelists/blacklists are supported. The permission you specify in the commands for setup are not exact however. If you put `eaglefire` as the whitelist permission, the actual permission would be `ShopsUI:groups.eaglefire`. The permission you specify has `ShopsUI:groups.` added to the front.
+
+### Migration
+
+If you wish to migrate from ZaupShops, you can simply run the command `/shop migrate`.
+
+If you used whitelists and blacklists with ZaupShop, you must also change some of your permissions. All existing permissions starting with `zaupgroups.` must be changed to start with `ShopsUI:groups.`.
+For example, the following permissions show their original and their migrated permissions:
+- `zaupgroup.epicguns` -> `ShopsUI:groups.epicguns`
+- `zaupgroup.vip` -> `ShopsUI:groups.vip`
+- `zaupgroup.mvp` -> `ShopsUI:groups.mvp`
 
 ### Commands
 
