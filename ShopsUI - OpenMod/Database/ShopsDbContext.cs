@@ -1,15 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OpenMod.EntityFrameworkCore;
+using OpenMod.EntityFrameworkCore.Configurator;
 using ShopsUI.Database.Models;
-using SilK.OpenMod.EntityFrameworkCore;
 using System;
 
 namespace ShopsUI.Database
 {
-    public class ShopsDbContext : OpenModPomeloDbContext<ShopsDbContext>
+    public class ShopsDbContext : OpenModDbContext<ShopsDbContext>
     {
-        public ShopsDbContext(
-            DbContextOptions<ShopsDbContext> options,
-            IServiceProvider serviceProvider) : base(options, serviceProvider)
+        public ShopsDbContext(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
+        public ShopsDbContext(IDbContextConfigurator configurator, IServiceProvider serviceProvider) : base(configurator, serviceProvider)
         {
         }
 

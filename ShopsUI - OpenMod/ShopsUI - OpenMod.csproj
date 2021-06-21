@@ -23,6 +23,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.1.1" />
     <PackageReference Include="OpenMod.Extensions.Economy.Abstractions" Version="3.0.33" />
     <PackageReference Include="OpenMod.Unturned" Version="3.0.33" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
@@ -32,7 +33,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SilK.OpenMod.EntityFrameworkCore" Version="1.0.3" />
     <PackageReference Include="SilK.Unturned.Extras" Version="1.6.1" />
   </ItemGroup>
 
