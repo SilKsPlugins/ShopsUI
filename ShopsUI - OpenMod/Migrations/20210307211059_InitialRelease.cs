@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.Data.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ShopsUI.Migrations
 {
@@ -12,7 +12,7 @@ namespace ShopsUI.Migrations
                 columns: table => new
                 {
                     ItemShopId = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     BuyPrice = table.Column<decimal>(nullable: true),
                     SellPrice = table.Column<decimal>(nullable: true),
                     Order = table.Column<int>(nullable: false)
@@ -27,7 +27,7 @@ namespace ShopsUI.Migrations
                 columns: table => new
                 {
                     VehicleShopId = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     BuyPrice = table.Column<decimal>(nullable: false),
                     Order = table.Column<int>(nullable: false)
                 },

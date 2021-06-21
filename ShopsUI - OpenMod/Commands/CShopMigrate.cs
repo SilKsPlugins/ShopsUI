@@ -1,5 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
-using MySql.Data.MySqlClient;
+﻿extern alias MySqlConnectorAnnotations;
+using Cysharp.Threading.Tasks;
+using MySqlConnectorAnnotations::MySql.Data.MySqlClient;
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
@@ -93,7 +94,7 @@ namespace ShopsUI.Commands
 
             var command = new MySqlCommand(query, connection);
 
-            using var reader = command.ExecuteReader();
+            await using var reader = await command.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {

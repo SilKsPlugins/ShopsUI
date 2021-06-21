@@ -1,8 +1,8 @@
-﻿using SilK.OpenMod.EntityFrameworkCore;
+﻿using OpenMod.EntityFrameworkCore.MySql;
 
 namespace ShopsUI.Database
 {
-    public class ShopsDbContextFactory : OpenModPomeloDbContextFactory<ShopsDbContext>
+    public class ShopsDbContextFactory : OpenModMySqlDbContextFactory<ShopsDbContext>
     {
     }
 }

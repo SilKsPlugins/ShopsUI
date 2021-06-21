@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using OpenMod.API.Plugins;
-using OpenMod.EntityFrameworkCore.Extensions;
 using OpenMod.Unturned.Plugins;
 using ShopsUI.Database;
 using System;
@@ -21,7 +21,7 @@ namespace ShopsUI
 
         protected override async UniTask OnLoadAsync()
         {
-            await _dbContext.OpenModMigrateAsync();
+            await _dbContext.Database.MigrateAsync();
         }
     }
 }
