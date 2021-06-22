@@ -1,5 +1,6 @@
 ﻿using OpenMod.Extensions.Games.Abstractions.Items;
 using OpenMod.Unturned.Items;
+using SDG.Unturned;
 
 namespace ShopsUI
 {
@@ -10,6 +11,7 @@ namespace ShopsUI
             ItemQuality = itemAsset.MaxQuality ?? 100;
             ItemDurability = itemAsset.MaxDurability ?? 100;
             ItemAmount = itemAsset.MaxAmount ?? 1;
+            StateData = itemAsset.ItemAsset.getState(EItemOrigin.ADMIN);
         }
 
         public double ItemQuality { get; }
