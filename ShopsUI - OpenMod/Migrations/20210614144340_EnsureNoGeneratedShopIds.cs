@@ -55,7 +55,7 @@ namespace ShopsUI.Migrations
                 table: "ShopsUI_VehicleGroups");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_ShopsUI_ItemGroups_ShopsUI_ItemShops_ItemShopItemId~",
+                name: "FK_ShopsUI_ItemGroups_ShopsUI_ItemShops_ItemShopItemId",
                 table: "ShopsUI_ItemGroups");
 
             migrationBuilder.AlterColumn<ushort>(
@@ -83,7 +83,7 @@ namespace ShopsUI.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ShopsUI_ItemGroups_ShopsUI_ItemShops_ItemShopItemId~",
+                name: "FK_ShopsUI_ItemGroups_ShopsUI_ItemShops_ItemShopItemId",
                 table: "ShopsUI_ItemGroups",
                 column: "ItemShopItemId",
                 principalTable: "ShopsUI_ItemShops",
