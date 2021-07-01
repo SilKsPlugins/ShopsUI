@@ -319,8 +319,6 @@ namespace ShopsUI.UI
             if (_processingButtonClick) return;
             _processingButtonClick = true;
 
-            _logger.LogInformation($"Clicked: {buttonName}");
-
             try
             {
                 await UniTask.SwitchToThreadPool();
