@@ -1,13 +1,14 @@
 ﻿using Cysharp.Threading.Tasks;
+using OpenMod.API;
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Commands;
 using OpenMod.Unturned.Users;
 using ShopsUI.API.UI;
-using System;
 using ShopsUI.UI;
 using SilK.Unturned.Extras.UI;
+using System;
 
 namespace ShopsUI.Commands.Vehicles
 {
@@ -19,11 +20,14 @@ namespace ShopsUI.Commands.Vehicles
     public class CVShop : UnturnedCommand
     {
         private readonly IUIManager _uiManager;
+        private readonly IOpenModComponent _openModComponent;
 
         public CVShop(IUIManager uiManager,
+            IOpenModComponent openModComponent,
             IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _uiManager = uiManager;
+            _openModComponent = openModComponent;
         }
 
         protected override async UniTask OnExecuteAsync()
@@ -33,7 +37,8 @@ namespace ShopsUI.Commands.Vehicles
             if (Context.Actor is not UnturnedUser user)
                 throw new UserFriendlyException("This command can only be called by a player");
 
-            var session = await _uiManager.StartSession<ShopsUISession>(user);
+            var session =
+                await _uiManager.StartSession<ShopsUISession>(user, lifetimeScope: _openModComponent.LifetimeScope);
 
             await session.SetTab(UITab.Vehicles);
         }
