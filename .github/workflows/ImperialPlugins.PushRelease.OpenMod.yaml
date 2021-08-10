@@ -42,7 +42,6 @@ jobs:
         token: "${{ secrets.GITHUB_TOKEN }}"
         
     - name: Build Post File
-      if: ${{ github. }}
       run: |
         jo markdownChangelog=@description.txt \
           displayVersion="${{ env.VERSION }}" \
