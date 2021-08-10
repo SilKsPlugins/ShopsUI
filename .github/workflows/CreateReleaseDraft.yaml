@@ -60,6 +60,7 @@ jobs:
         rm OpenMod.API.dll OpenMod.Core.dll OpenMod.Common.dll OpenMod.NuGet.dll
         rm Autofac*.dll
         rm NuGet.*.dll
+        mv Microsoft.Extensions.Caching.*.dll ../OpenMod/Libraries
         rm Microsoft.Extensions.*.dll
         rm dnlib.dll
         mv *.dll ../OpenMod/Libraries
