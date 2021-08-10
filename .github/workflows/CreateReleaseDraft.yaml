@@ -55,14 +55,12 @@ jobs:
         cd Publish
         mv "${{ env.PLUGIN_NAME }}.dll" ../OpenMod/Plugins
         mv product.json ../OpenMod
-        rm System.*.dll
-        rm netstandard.dll
+        rm System.*.dll netstandard.dll
         rm 0Harmony.dll
-        rm OpenMod.API.dll
-        rm OpenMod.Core.dll
-        rm OpenMod.Common.dll
-        rm OpenMod.NuGet.dll
+        rm OpenMod.API.dll OpenMod.Core.dll OpenMod.Common.dll OpenMod.NuGet.dll
+        rm Autofac*.dll
         rm NuGet.*.dll
+        rm dnlib.dll
         mv *.dll ../OpenMod/Libraries
         cd ../OpenMod
         zip -qr ./Release.zip *
