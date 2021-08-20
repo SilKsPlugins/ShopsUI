@@ -120,6 +120,8 @@ namespace ShopsUI.UI
 
         private async UniTask ShowItemShopPage(int page)
         {
+            await UniTask.SwitchToThreadPool();
+
             var shops =
                 (await _shopManager.GetItemShopDatasAsync(x => x
                     .Skip(page * MaxItemsPerPage)
@@ -127,6 +129,8 @@ namespace ShopsUI.UI
                 .ToList();
 
             _currentPage = page;
+
+            await UniTask.SwitchToMainThread();
 
             SendVisibility("PrevPage", _currentPage > 0);
             SendVisibility("NextPage", shops.Count > MaxItemsPerPage);
@@ -192,12 +196,16 @@ namespace ShopsUI.UI
 
         private async UniTask ShowVehicleShopPage(int page)
         {
+            await UniTask.SwitchToThreadPool();
+
             var shops =
                 (await _shopManager.GetVehicleShopDatasAsync(x => x
                     .Skip(page * MaxItemsPerPage)
                     .Take(MaxItemsPerPage + 1))).ToList();
 
             _currentPage = page;
+
+            await UniTask.SwitchToMainThread();
 
             SendVisibility("PrevPage", _currentPage > 0);
             SendVisibility("NextPage", shops.Count > MaxItemsPerPage);
