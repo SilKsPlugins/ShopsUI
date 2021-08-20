@@ -253,6 +253,8 @@ namespace ShopsUI.UI
         {
             if (CurrentTab == tab) return;
 
+            await UniTask.SwitchToMainThread();
+
             // Clean up current tab
             if (CurrentTab == UITab.Items || CurrentTab == UITab.Vehicles)
             {
