@@ -106,16 +106,16 @@ namespace ShopsUI.UI
             ClearEffect();
         }
 
-        private UniTask ShowBalance(decimal balance)
+        private async UniTask ShowBalance(decimal balance)
         {
+            await UniTask.SwitchToMainThread();
+
             SendText("ShopBalance", _stringLocalizer["ui:balance", new
             {
                 Balance = balance,
                 _economyProvider.CurrencyName,
                 _economyProvider.CurrencySymbol
             }]);
-
-            return UniTask.CompletedTask;
         }
 
         private async UniTask ShowItemShopPage(int page)
@@ -292,16 +292,16 @@ namespace ShopsUI.UI
             }
         }
 
-        public UniTask ShowAlert(string message, bool isSuccess)
+        public async UniTask ShowAlert(string message, bool isSuccess)
         {
+            await UniTask.SwitchToMainThread();
+
             var key = isSuccess ? "AlertSuccessText" : "AlertFailureText";
 
             SendVisibility("AlertSuccessText", false);
             SendVisibility("AlertFailureText", false);
             SendText(key, message);
             SendVisibility(key, true);
-
-            return UniTask.CompletedTask;
         }
 
         private static bool TryGetIndex(string prefix, string buttonName, out int index)
