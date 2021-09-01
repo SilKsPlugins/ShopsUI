@@ -52,6 +52,7 @@ jobs:
         mkdir -p ./OpenMod/Plugins ./OpenMod/Libraries
         cd "./${{ env.PLUGIN_NAME }} - OpenMod/bin/Release/net461"
         mv "${{ env.PLUGIN_NAME }}.dll" ../../../../OpenMod/Plugins
+        mv MySqlConnector.dll ../../../../OpenMod/Libraries
         mv product.json ../../../../OpenMod
         cd ../../../../OpenMod
         zip -qr ./Release.zip *
