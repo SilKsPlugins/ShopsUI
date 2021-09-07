@@ -244,7 +244,6 @@ namespace ShopsUI.Shops
 
             await _dbContext.ItemGroups.AddAsync(new ItemGroupModel
             {
-                Id = id,
                 Permission = permission,
                 IsWhitelist = true,
                 ItemShop = data
@@ -257,7 +256,8 @@ namespace ShopsUI.Shops
 
         public async Task<bool> RemoveItemWhitelist(ushort id, string permission)
         {
-            var group = await _dbContext.ItemGroups.FirstOrDefaultAsync(x => x.Id == id && x.Permission == permission && x.IsWhitelist);
+            var group = await _dbContext.ItemGroups.FirstOrDefaultAsync(x =>
+                x.ItemShopItemId == id && x.Permission == permission && x.IsWhitelist);
 
             if (group == null)
             {
@@ -289,7 +289,6 @@ namespace ShopsUI.Shops
 
             await _dbContext.ItemGroups.AddAsync(new ItemGroupModel
             {
-                Id = id,
                 Permission = permission,
                 IsWhitelist = false,
                 ItemShop = data
@@ -302,7 +301,8 @@ namespace ShopsUI.Shops
 
         public async Task<bool> RemoveItemBlacklist(ushort id, string permission)
         {
-            var group = await _dbContext.ItemGroups.FirstOrDefaultAsync(x => x.Id == id && x.Permission == permission && !x.IsWhitelist);
+            var group = await _dbContext.ItemGroups.FirstOrDefaultAsync(x =>
+                x.ItemShopItemId == id && x.Permission == permission && !x.IsWhitelist);
 
             if (group == null)
             {
@@ -333,7 +333,6 @@ namespace ShopsUI.Shops
 
             await _dbContext.VehicleGroups.AddAsync(new VehicleGroupModel
             {
-                Id = id,
                 Permission = permission,
                 IsWhitelist = true,
                 VehicleShop = data
@@ -346,7 +345,8 @@ namespace ShopsUI.Shops
 
         public async Task<bool> RemoveVehicleWhitelist(ushort id, string permission)
         {
-            var group = await _dbContext.VehicleGroups.FirstOrDefaultAsync(x => x.Id == id && x.Permission == permission && x.IsWhitelist);
+            var group = await _dbContext.VehicleGroups.FirstOrDefaultAsync(x =>
+                x.VehicleShopVehicleId == id && x.Permission == permission && x.IsWhitelist);
 
             if (group == null)
             {
@@ -378,7 +378,6 @@ namespace ShopsUI.Shops
 
             await _dbContext.VehicleGroups.AddAsync(new VehicleGroupModel
             {
-                Id = id,
                 Permission = permission,
                 IsWhitelist = false,
                 VehicleShop = data
@@ -391,7 +390,8 @@ namespace ShopsUI.Shops
 
         public async Task<bool> RemoveVehicleBlacklist(ushort id, string permission)
         {
-            var group = await _dbContext.VehicleGroups.FirstOrDefaultAsync(x => x.Id == id && x.Permission == permission && !x.IsWhitelist);
+            var group = await _dbContext.VehicleGroups.FirstOrDefaultAsync(x =>
+                x.VehicleShopVehicleId == id && x.Permission == permission && !x.IsWhitelist);
 
             if (group == null)
             {
