@@ -35,7 +35,9 @@ namespace ShopsUI.Commands.Vehicles
             await UniTask.SwitchToMainThread();
 
             if (Context.Actor is not UnturnedUser user)
-                throw new UserFriendlyException("This command can only be called by a player");
+            {
+                throw new CommandWrongUsageException(Context);
+            }
 
             var session =
                 await _uiManager.StartSession<ShopsUISession>(user, lifetimeScope: _openModComponent.LifetimeScope);
