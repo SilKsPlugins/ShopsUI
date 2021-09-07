@@ -28,30 +28,35 @@ namespace ShopsUI.Database
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ItemShopModel>()
-                .HasKey(x => x.ItemId);
+            modelBuilder.Entity<ItemShopModel>(entity =>
+            {
+                entity.HasKey(x => x.ItemId);
 
-            modelBuilder.Entity<ItemShopModel>()
-                .Property(x => x.ItemId)
-                .ValueGeneratedNever();
+                entity.Property(x => x.ItemId)
+                    .ValueGeneratedNever();
 
-            modelBuilder.Entity<ItemShopModel>()
-                .HasMany(x => x.AuthGroups)
-                .WithOne(x => x.ItemShop)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(x => x.AuthGroups)
+                    .WithOne(x => x.ItemShop)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
-            modelBuilder.Entity<VehicleShopModel>()
-                .HasKey(x => x.VehicleId);
+            modelBuilder.Entity<VehicleShopModel>(entity =>
+            {
+                entity.HasKey(x => x.VehicleId);
 
-            modelBuilder.Entity<VehicleShopModel>()
-                .Property(x => x.VehicleId)
-                .ValueGeneratedNever();
+                entity.Property(x => x.VehicleId)
+                    .ValueGeneratedNever();
 
-            modelBuilder.Entity<VehicleShopModel>()
-                .HasMany(x => x.AuthGroups)
-                .WithOne(x => x.VehicleShop)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(x => x.AuthGroups)
+                    .WithOne(x => x.VehicleShop)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
+            modelBuilder.Entity<ItemGroupModel>(entity =>
+            {
+                entity.Property(x => x.Id)
+                    .ValueGeneratedOnAdd();
+            });
             modelBuilder.Entity<ItemGroupModel>()
                 .Property(x => x.Id)
                 .ValueGeneratedOnAdd();
