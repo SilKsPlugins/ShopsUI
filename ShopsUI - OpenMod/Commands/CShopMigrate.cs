@@ -1,11 +1,13 @@
 ﻿extern alias MySqlConnectorAnnotations;
 using Cysharp.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using MySqlConnectorAnnotations::MySql.Data.MySqlClient;
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Commands;
 using SDG.Unturned;
+using ShopsUI.API.Migrations;
 using ShopsUI.Commands.Items;
 using ShopsUI.Database;
 using ShopsUI.Database.Models;
@@ -52,11 +54,14 @@ namespace ShopsUI.Commands
         }
 
         private readonly ShopsDbContext _dbContext;
+        private readonly IMigrationVerifier _migrationVerifier;
 
         public CShopMigrate(ShopsDbContext dbContext,
+            IMigrationVerifier migrationVerifier,
             IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _dbContext = dbContext;
+            _migrationVerifier = migrationVerifier;
         }
 
         private async Task<T> GetPluginConfig<T>(string path) where T : class, new()
@@ -86,6 +91,19 @@ namespace ShopsUI.Commands
                 throw new UserFriendlyException(
                     $"There was an issue parsing the configuration file: {Path.GetFileName(path)}");
             }
+        }
+
+        private async Task ClearExistingDatabase()
+        {
+            async Task ClearSet<T>(DbSet<T> set) where T : class
+            {
+                set.RemoveRange(await set.ToListAsync());
+            }
+
+            await ClearSet(_dbContext.ItemGroups);
+            await ClearSet(_dbContext.VehicleGroups);
+            await ClearSet(_dbContext.ItemShops);
+            await ClearSet(_dbContext.VehicleShops);
         }
 
         private async Task MigrateItemShops(MySqlConnection connection, ZaupShopConfiguration config)
@@ -140,9 +158,9 @@ namespace ShopsUI.Commands
 
             var tables = new List<(string Name, bool Whitelist)>();
 
-            using (var command = new MySqlCommand(mainGroupQuery, connection))
+            await using (var command = new MySqlCommand(mainGroupQuery, connection))
             {
-                using var reader = command.ExecuteReader();
+                await using var reader = await command.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
                 {
@@ -158,9 +176,9 @@ namespace ShopsUI.Commands
             {
                 var groupTableQuery = $"SELECT `assetid`,`vehicle` FROM `{name}`;";
 
-                using var command = new MySqlCommand(groupTableQuery, connection);
+                await using var command = new MySqlCommand(groupTableQuery, connection);
 
-                using var reader = command.ExecuteReader();
+                await using var reader = await command.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
                 {
@@ -191,6 +209,14 @@ namespace ShopsUI.Commands
 
         protected override async UniTask OnExecuteAsync()
         {
+            if (!_migrationVerifier.CheckShouldContinueMigration(Context.Actor))
+            {
+                await PrintAsync("By using this migration command, you will erase all existing ShopsUI shops. " +
+                                 "If you wish to continue, please run the command again.");
+
+                return;
+            }
+
             await UniTask.SwitchToThreadPool();
 
             await PrintAsync("Beginning shop migration. This may take a while.");
@@ -209,7 +235,9 @@ namespace ShopsUI.Commands
                 $"User={uconomyConfig.DatabaseUsername};" +
                 $"Password={uconomyConfig.DatabasePassword}";
 
-            using var connection = new MySqlConnection(connectionString);
+            await ClearExistingDatabase();
+
+            await using var connection = new MySqlConnection(connectionString);
 
             await connection.OpenAsync();
 
@@ -224,9 +252,12 @@ namespace ShopsUI.Commands
 
             await connection.CloseAsync();
 
-            var entries = await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
 
-            await PrintAsync($"Successfully migrated and written {entries} new entries to the database.");
+            var itemShops = await _dbContext.ItemShops.CountAsync();
+            var vehicleShops = await _dbContext.VehicleShops.CountAsync();
+
+            await PrintAsync($"Successfully migrated {itemShops} item shops and {vehicleShops} vehicle shops.");
 
             if (migrateGroups)
             {

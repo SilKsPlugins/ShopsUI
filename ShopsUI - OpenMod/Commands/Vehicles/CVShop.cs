@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using OpenMod.API;
-using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Commands;

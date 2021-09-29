@@ -5,10 +5,10 @@ using ShopsUI.Database;
 namespace ShopsUI
 {
     public class PluginContainerConfigurator : IPluginContainerConfigurator
-{
-    public void ConfigureContainer(IPluginServiceConfigurationContext context)
     {
-        context.ContainerBuilder.AddMySqlDbContext<ShopsDbContext>();
+        public void ConfigureContainer(IPluginServiceConfigurationContext context)
+        {
+            context.ContainerBuilder.AddMySqlDbContext<ShopsDbContext>();
+        }
     }
-}
 }
