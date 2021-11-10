@@ -9,6 +9,7 @@ using System;
 namespace ShopsUI.Commands.Items
 {
     [Command("sellbox", Priority = Priority.High)]
+    [CommandAlias("sbox")]
     [CommandDescription("Open a virtual inventory where you can quickly sell items.")]
     [CommandActor(typeof(UnturnedUser))]
     public class CSellBox : UnturnedCommand
