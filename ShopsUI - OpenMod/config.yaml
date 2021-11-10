@@ -13,6 +13,10 @@ shops:
   # When this setting is set to true, shop whitelists will not be ignored.
   whitelistEnabled: false
 
+sellbox: # Default sellbox size. Set either to zero to disable by default.
+  width: 8
+  height: 6
+
 ui:
   logoUrl: "https://i.imgur.com/t6HbFTN.png"
   mainEffect: 29150

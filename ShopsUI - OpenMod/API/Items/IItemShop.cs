@@ -1,6 +1,7 @@
-﻿using OpenMod.Unturned.Users;
+﻿using OpenMod.API.Permissions;
+using OpenMod.API.Users;
+using OpenMod.Extensions.Games.Abstractions.Items;
 using System.Threading.Tasks;
-using OpenMod.API.Permissions;
 
 namespace ShopsUI.API.Items
 {
@@ -9,10 +10,10 @@ namespace ShopsUI.API.Items
         IItemShopData ShopData { get; }
         
         bool CanBuy();
-        Task<decimal> Buy(UnturnedUser user, int amount = 1);
+        Task<decimal> Buy(IUser user, IInventory inventory, int amount = 1);
 
         bool CanSell();
-        Task<decimal> Sell(UnturnedUser user, int amount = 1);
+        Task<decimal> Sell(IUser user, IInventory inventory, int amount = 1);
 
         Task<bool> IsPermitted(IPermissionActor user);
     }

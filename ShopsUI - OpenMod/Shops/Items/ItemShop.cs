@@ -5,10 +5,10 @@ using Microsoft.Extensions.Logging;
 using OpenMod.API;
 using OpenMod.API.Commands;
 using OpenMod.API.Permissions;
+using OpenMod.API.Users;
 using OpenMod.Extensions.Economy.Abstractions;
 using OpenMod.Extensions.Games.Abstractions.Items;
 using OpenMod.Unturned.Items;
-using OpenMod.Unturned.Users;
 using ShopsUI.API.Items;
 using ShopsUI.Database.Models;
 using System;
@@ -80,13 +80,13 @@ namespace ShopsUI.Shops.Items
 
         public bool CanBuy() => ShopData.BuyPrice != null;
 
-        public async Task<decimal> Buy(UnturnedUser user, int amount = 1)
+        public async Task<decimal> Buy(IUser user, IInventory inventory, int amount = 1)
         {
             if (!CanBuy())
                 throw new InvalidOperationException("No buying at this shop");
 
             VerifyAmount(amount);
-
+            
             var itemAsset = await GetItemAsset();
 
             await UniTask.SwitchToMainThread();
@@ -108,7 +108,7 @@ namespace ShopsUI.Shops.Items
             {
                 var itemState = new AdminItemState(itemAsset);
 
-                var item = await _itemSpawner.GiveItemAsync(user.Player.Inventory, itemAsset, itemState);
+                var item = await _itemSpawner.GiveItemAsync(inventory, itemAsset, itemState);
 
                 if (item == null)
                 {
@@ -121,7 +121,7 @@ namespace ShopsUI.Shops.Items
 
         public bool CanSell() => ShopData.SellPrice != null;
 
-        public async Task<decimal> Sell(UnturnedUser user, int amount = 1)
+        public async Task<decimal> Sell(IUser user, IInventory inventory, int amount = 1)
         {
             if (!CanSell())
                 throw new InvalidOperationException("No selling at this shop");
@@ -134,16 +134,16 @@ namespace ShopsUI.Shops.Items
 
             var id = ShopData.ItemId.ToString();
 
-            var count = user.Player.Inventory.Pages.SelectMany(x => x.Items)
+            var count = inventory.Pages.SelectMany(x => x.Items)
                 .Count(inventoryItem => inventoryItem.Item.Asset.ItemAssetId == id);
 
             if (count < amount)
                 throw new UserFriendlyException(_stringLocalizer["commands:errors:not_enough_items",
                     new {CurrentAmount = count, NeededAmount = amount}]);
-
+            
             var deleted = 0;
 
-            foreach (var page in user.Player.Inventory.Pages)
+            foreach (var page in inventory.Pages)
             {
                 var items = page.Items.ToList();
 

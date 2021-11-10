@@ -35,6 +35,8 @@ commands:
       removed:
         item: "Successfully removed blacklist for item {ItemAsset.ItemAssetId} with permission {Permission}."
         vehicle: "Successfully removed blacklist for vehicle {VehicleAsset.VehicleAssetId} with permission {Permission}."
+    sellbox_sold: "You have sold {TotalAmount} items for {TotalPrice}. {ReturnedAmount} have been returned to you."
+      
   errors:
     invalid_item_id: "Given item id ({IdOrName}) does not exist."
     invalid_vehicle_id: "Given vehicle id ({IdOrName}) does not exist."
@@ -48,6 +50,7 @@ commands:
     no_buyable_vehicle_shop: "The vehicle {VehicleAsset.VehicleName} cannot be bought."
     not_permitted_item: "You are not permitted to buy/sell {ItemAsset.ItemName}."
     not_permitted_vehicle: "You are not permitted to buy {VehicleAsset.VehicleName}."
+    no_sellbox: "You cannot use /sellbox."
     shop_whitelist:
       added:
         item: "A whitelist for this item could not be added. This shop may not exist or the whitelist has already been added."

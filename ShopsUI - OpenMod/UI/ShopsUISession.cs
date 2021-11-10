@@ -12,6 +12,7 @@ using ShopsUI.API.UI;
 using SilK.Unturned.Extras.UI;
 using System;
 using System.Linq;
+using ShopsUI.API.Items;
 
 namespace ShopsUI.UI
 {
