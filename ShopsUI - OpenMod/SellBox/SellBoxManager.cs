@@ -6,6 +6,7 @@ using OpenMod.API.Commands;
 using OpenMod.API.Ioc;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Helpers;
+using OpenMod.Extensions.Economy.Abstractions;
 using OpenMod.Unturned.Users;
 using OpenMod.Unturned.Users.Events;
 using ShopsUI.API;
@@ -27,16 +28,19 @@ namespace ShopsUI.SellBox
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<SellBoxManager> _logger;
         private readonly IStringLocalizer _stringLocalizer;
+        private readonly IEconomyProvider _economyProvider;
 
         private readonly Dictionary<UnturnedUser, SellBoxInstance> _sellBoxes = new();
 
         public SellBoxManager(IServiceProvider serviceProvider,
             ILogger<SellBoxManager> logger,
-            IStringLocalizer stringLocalizer)
+            IStringLocalizer stringLocalizer,
+            IEconomyProvider economyProvider)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
             _stringLocalizer = stringLocalizer;
+            _economyProvider = economyProvider;
 
             SellBoxInstance.OnSellBoxClosed += OnSellBoxClosed;
         }
@@ -162,7 +166,14 @@ namespace ShopsUI.SellBox
                 }
 
                 await user.PrintMessageAsync(_stringLocalizer["commands:success:sellbox_sold",
-                    new {TotalAmount = totalAmount, TotalPrice = totalPrice, ReturnedAmount = totalReturned}]);
+                    new
+                    {
+                        TotalAmount = totalAmount,
+                        TotalPrice = totalPrice,
+                        ReturnedAmount = totalReturned,
+                        _economyProvider.CurrencySymbol,
+                        _economyProvider.CurrencyName
+                    }]);
 
             }).Forget();
         }
