@@ -54,5 +54,20 @@ jobs:
       shell: bash
       
     - name: Push Release File to Imperial Plugins
-      run: "curl -X POST \"${{ env.IP_API_URL }}\" -H  \"accept: */*\" -H  \"Content-Type: application/json\" -H \"X-API-KEY: ${{ env.IP_API_KEY }}\" -d @postdata.txt"
-      shell: bash
+      run: |
+        curl 'https://api.imperialplugins.com/v2/Products/Files' -X POST \
+          -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0' \
+          -H 'Accept: */*' \
+          -H 'Accept-Language: en-US,en;q=0.5' \
+          --compressed \
+          -H 'Content-Type: application/json' \
+          -H 'Origin: https://imperialplugins.com' \
+          -H 'Connection: keep-alive' \
+          -H 'Referer: https://imperialplugins.com/' \
+          -H 'Sec-Fetch-Dest: empty' \
+          -H 'Sec-Fetch-Mode: cors' \
+          -H 'Sec-Fetch-Site: same-site' \
+          -H 'TE: trailers' \
+          -H \"X-API-KEY: ${{ env.IP_API_KEY }}\" \
+          -d @postdata.txt
+      shell: bash 
