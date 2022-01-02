@@ -35,3 +35,6 @@ ui:
 
   buttonDelay: 1 # How long to wait until buy/sell buttons can be clicked again in seconds
   categoryButtonDelay: 0.2 # How long to wait until category buttons can be clicked again in seconds.
+
+  showEmptyCategories: false
+  showSellOnlyShops: true

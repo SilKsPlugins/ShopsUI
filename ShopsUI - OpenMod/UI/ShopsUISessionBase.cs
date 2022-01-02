@@ -98,6 +98,8 @@ namespace ShopsUI.UI
 
         protected abstract string GetAssetName(TAsset asset);
 
+        protected virtual bool ShouldShowShop(TShopData shopData) => true;
+
         protected override async UniTask OnStartAsync()
         {
             var categories = (await GetCategories()).ToList();
@@ -194,6 +196,11 @@ namespace ShopsUI.UI
                 categories.Insert(0, defaultCategory);
             }
 
+            if (!Configuration.Instance.UI.ShowEmptyCategories)
+            {
+                categories.RemoveAll(x => x.Shops is { Count: 0 });
+            }
+
             return categories;
         }
 
@@ -240,6 +247,8 @@ namespace ShopsUI.UI
         private async UniTask ShowShops(IEnumerable<ShopInfo> itemShops)
         {
             _currentShopsList = itemShops.ToList();
+
+            _currentShopsList.RemoveAll(x => !ShouldShowShop(x.ShopData));
 
             Logger.LogDebug($"Showing shops (Count: {_currentShopsList.Count})");
 

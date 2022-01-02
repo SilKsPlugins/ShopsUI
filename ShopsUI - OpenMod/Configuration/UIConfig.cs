@@ -16,5 +16,9 @@ namespace ShopsUI.Configuration
         public float ButtonDelay { get; set; } = 1;
 
         public float CategoryButtonDelay { get; set; } = 0.2f;
+        
+        public bool ShowEmptyCategories { get; set; } = false;
+
+        public bool ShowSellOnlyShops { get; set; } = true;
     }
 }

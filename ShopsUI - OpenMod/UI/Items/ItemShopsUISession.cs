@@ -125,6 +125,11 @@ namespace ShopsUI.UI.Items
             return new BasicShopCategory<IItemShopData>(name, shops);
         }
 
+        protected override bool ShouldShowShop(IItemShopData shopData)
+        {
+            return Configuration.Instance.UI.ShowSellOnlyShops || shopData.SellPrice.HasValue;
+        }
+
         protected override async UniTask OnShopBuy(IItemShop shop, IItemAsset asset)
         {
             await shop.Buy(User);
