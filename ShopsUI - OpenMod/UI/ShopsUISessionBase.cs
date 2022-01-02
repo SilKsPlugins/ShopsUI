@@ -80,7 +80,7 @@ namespace ShopsUI.UI
             _shopsUIList = new UIList<ShopInfo>(UIElements.MaxShopItems, DisplayShopItem, DisplayNoShopItem);
             _categoriesUIList = new UIList<IShopCategory<TShopData>>(UIElements.MaxCategories, DisplayCategory, DisplayNoCategory);
 
-            EffectId = Configuration.Instance.UI.MainEffect;
+            EffectId = Configuration.Instance.UI.ShopsEffect;
         }
 
         protected abstract Task<TAsset?> GetAsset(ushort assetId);

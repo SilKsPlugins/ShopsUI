@@ -7,7 +7,7 @@ namespace ShopsUI.Configuration
     {
         public string? LogoUrl { get; set; } = "https://i.imgur.com/t6HbFTN.png";
 
-        public ushort MainEffect { get; set; } = 29150;
+        public ushort ShopsEffect { get; set; } = 29150;
 
         public ushort SellBoxEffect { get; set; } = 29200;
 
