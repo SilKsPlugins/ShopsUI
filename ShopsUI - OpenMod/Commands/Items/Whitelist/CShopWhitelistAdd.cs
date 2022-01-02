@@ -2,6 +2,7 @@
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
+using ShopsUI.API.Shops.Items.Whitelist;
 using System;
 
 namespace ShopsUI.Commands.Items.Whitelist
@@ -14,8 +15,12 @@ namespace ShopsUI.Commands.Items.Whitelist
     [CommandParent(typeof(CShopWhitelist))]
     public class CShopWhitelistAdd : ShopCommand
     {
-        public CShopWhitelistAdd(IServiceProvider serviceProvider) : base(serviceProvider)
+        private readonly IItemShopWhitelistEditor _whitelistEditor;
+
+        public CShopWhitelistAdd(IServiceProvider serviceProvider,
+            IItemShopWhitelistEditor whitelistEditor) : base(serviceProvider)
         {
+            _whitelistEditor = whitelistEditor;
         }
 
         protected override async UniTask OnExecuteAsync()
@@ -23,7 +28,7 @@ namespace ShopsUI.Commands.Items.Whitelist
             var asset = await GetItemAsset(0);
             var permission = await Context.Parameters.GetAsync<string>(1);
 
-            if (await ShopManager.AddItemWhitelist(ushort.Parse(asset.ItemAssetId), permission))
+            if (await _whitelistEditor.AddWhitelist(ushort.Parse(asset.ItemAssetId), permission))
             {
                 await PrintAsync(StringLocalizer["commands:success:shop_whitelist:added:item",
                     new {ItemAsset = asset, Permission = permission}]);

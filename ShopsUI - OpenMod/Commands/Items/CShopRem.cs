@@ -5,11 +5,12 @@ using System;
 
 namespace ShopsUI.Commands.Items
 {
-    [Command("rem")]
+    [Command("remove")]
+    [CommandAlias("rem")]
     [CommandAlias("r")]
-    [CommandAlias("remove")]
     [CommandAlias("-")]
     [CommandSyntax("<buy | sell> <item>")]
+    [CommandDescription("Removes a shop")]
     [CommandParent(typeof(CShop))]
     public class CShopRem : UnturnedCommand
     {

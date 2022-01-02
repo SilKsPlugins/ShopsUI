@@ -13,7 +13,7 @@ namespace ShopsUI.SellBox.Inventory
 
         IInventory IInventoryPage.Inventory => Inventory;
 
-        public List<ItemJar> InventoryItems => Inventory.Storage.items.items;
+        public IList<Item> InventoryItems => Inventory.Items;
 
 
         public SellBoxInventoryPage(SellBoxInventory inventory)
@@ -28,7 +28,7 @@ namespace ShopsUI.SellBox.Inventory
         public bool IsReadOnly => false;
 
         public IReadOnlyCollection<IInventoryItem> Items =>
-            InventoryItems.Select(itemJar => new SellBoxInventoryItem(Inventory, itemJar)).ToList();
+            InventoryItems.Select(item => new SellBoxInventoryItem(Inventory, item)).ToList();
 
         public IEnumerator<IInventoryItem> GetEnumerator() => Items.GetEnumerator();
 

@@ -122,7 +122,7 @@ namespace ShopsUI.Commands
 
                 await _dbContext.ItemShops.AddAsync(new ItemShopModel
                 {
-                    ItemId = id,
+                    Id = id,
                     BuyPrice = buyPrice <= 0 ? null : buyPrice,
                     SellPrice = sellPrice <= 0 ? null : sellPrice,
                     Order = 0
@@ -145,7 +145,7 @@ namespace ShopsUI.Commands
 
                 await _dbContext.VehicleShops.AddAsync(new VehicleShopModel
                 {
-                    VehicleId = id,
+                    Id = id,
                     BuyPrice = buyPrice,
                     Order = 0
                 });

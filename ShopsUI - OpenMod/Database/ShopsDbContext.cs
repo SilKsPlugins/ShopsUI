@@ -24,39 +24,52 @@ namespace ShopsUI.Database
 
         public DbSet<VehicleGroupModel> VehicleGroups => Set<VehicleGroupModel>();
 
+        public DbSet<ItemCategoryModel> ItemCategories => Set<ItemCategoryModel>();
+
+        public DbSet<ItemShopCategoryModel> ItemShopCategories => Set<ItemShopCategoryModel>();
+
+        public DbSet<VehicleCategoryModel> VehicleCategories => Set<VehicleCategoryModel>();
+
+        public DbSet<VehicleShopCategoryModel> VehicleShopCategories => Set<VehicleShopCategoryModel>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ItemShopModel>(entity =>
             {
-                entity.HasKey(x => x.ItemId);
+                entity.HasKey(x => x.Id);
 
-                entity.Property(x => x.ItemId)
-                    .ValueGeneratedNever();
+                entity.Property(x => x.Id)
+                    .ValueGeneratedNever(); 
 
                 entity.HasMany(x => x.AuthGroups)
                     .WithOne(x => x.ItemShop)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(x => x.Categories)
+                    .WithOne(x => x.ItemShop)
+                    .HasForeignKey(x => x.ItemShopId)
+                    .IsRequired();
             });
 
             modelBuilder.Entity<VehicleShopModel>(entity =>
             {
-                entity.HasKey(x => x.VehicleId);
+                entity.HasKey(x => x.Id);
 
-                entity.Property(x => x.VehicleId)
+                entity.Property(x => x.Id)
                     .ValueGeneratedNever();
 
                 entity.HasMany(x => x.AuthGroups)
                     .WithOne(x => x.VehicleShop)
                     .OnDelete(DeleteBehavior.Cascade);
-            });
 
-            modelBuilder.Entity<ItemGroupModel>(entity =>
-            {
-                entity.Property(x => x.Id)
-                    .ValueGeneratedOnAdd();
+                entity.HasMany(x => x.Categories)
+                    .WithOne(x => x.VehicleShop)
+                    .HasForeignKey(x => x.VehicleShopId)
+                    .IsRequired();
             });
+            
             modelBuilder.Entity<ItemGroupModel>()
                 .Property(x => x.Id)
                 .ValueGeneratedOnAdd();
@@ -64,6 +77,38 @@ namespace ShopsUI.Database
             modelBuilder.Entity<VehicleGroupModel>()
                 .Property(x => x.Id)
                 .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<ItemCategoryModel>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasMany(x => x.ItemShops)
+                    .WithOne(x => x.ItemCategory)
+                    .HasForeignKey(x => x.ItemCategoryId)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity<ItemShopCategoryModel>()
+                .HasKey(x => new {x.ItemCategoryId, x.ItemShopId});
+
+            modelBuilder.Entity<VehicleCategoryModel>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasMany(x => x.VehicleShops)
+                    .WithOne(x => x.VehicleCategory)
+                    .HasForeignKey(x => x.VehicleCategoryId)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity<VehicleShopCategoryModel>()
+                .HasKey(x => new { x.VehicleCategoryId, x.VehicleShopId });
         }
     }
 }

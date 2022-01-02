@@ -2,6 +2,7 @@
 using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
+using ShopsUI.API.Shops;
 using System;
 
 namespace ShopsUI.Commands.Vehicles
@@ -22,7 +23,7 @@ namespace ShopsUI.Commands.Vehicles
         {
             var asset = await GetVehicleAsset(0);
 
-            var shop = await ShopManager.GetVehicleShop(ushort.Parse(asset.VehicleAssetId));
+            var shop = await VehicleShopDirectory.GetShop(ushort.Parse(asset.VehicleAssetId));
 
             if (shop == null)
                 throw new UserFriendlyException(
@@ -31,7 +32,7 @@ namespace ShopsUI.Commands.Vehicles
             if (!await shop.IsPermitted(Context.Actor))
             {
                 throw new UserFriendlyException(StringLocalizer["commands:errors:not_permitted_vehicle",
-                    new { VehicleAsset = asset }]);
+                    new {VehicleAsset = asset}]);
             }
 
             await PrintAsync(StringLocalizer["commands:success:vehicle_cost:buy",

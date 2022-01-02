@@ -1,4 +1,4 @@
-﻿using ShopsUI.API.Items;
+﻿using ShopsUI.API.Shops.Items;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +10,7 @@ namespace ShopsUI.Database.Models
     public class ItemShopModel : IItemShopData
     {
         [Key]
-        public ushort ItemId { get; set; }
+        public ushort Id { get; set; }
 
         [Column(TypeName = "decimal(24,2)")]
         public decimal? BuyPrice { get; set; }
@@ -20,11 +20,13 @@ namespace ShopsUI.Database.Models
         
         public int Order { get; set; }
 
-        public virtual ICollection<ItemGroupModel> AuthGroups { get; set; } = new List<ItemGroupModel>();
+        public ICollection<ItemGroupModel>? AuthGroups { get; set; }
+
+        public ICollection<ItemShopCategoryModel>? Categories { get; set; }
 
         public ItemShopModel()
         {
-            ItemId = 0;
+            Id = 0;
             BuyPrice = null;
             SellPrice = null;
             Order = 0;

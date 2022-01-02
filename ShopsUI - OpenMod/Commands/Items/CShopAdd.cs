@@ -10,6 +10,7 @@ namespace ShopsUI.Commands.Items
     [CommandAlias("a")]
     [CommandAlias("+")]
     [CommandSyntax("<buy | sell> <item> <price>")]
+    [CommandDescription("Adds a shop.")]
     [CommandParent(typeof(CShop))]
     public class CShopAdd : UnturnedCommand
     {

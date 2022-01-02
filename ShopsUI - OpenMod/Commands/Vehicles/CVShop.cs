@@ -4,8 +4,7 @@ using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Commands;
 using OpenMod.Unturned.Users;
-using ShopsUI.API.UI;
-using ShopsUI.UI;
+using ShopsUI.UI.Vehicles;
 using SilK.Unturned.Extras.UI;
 using System;
 
@@ -38,10 +37,7 @@ namespace ShopsUI.Commands.Vehicles
                 throw new CommandWrongUsageException(Context);
             }
 
-            var session =
-                await _uiManager.StartSession<ShopsUISession>(user, lifetimeScope: _openModComponent.LifetimeScope);
-
-            await session.SetTab(UITab.Vehicles);
+            await _uiManager.StartSession<VehicleShopsUISession>(user, lifetimeScope: _openModComponent.LifetimeScope);
         }
     }
 }

@@ -1,14 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Cysharp.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using OpenMod.API;
 using OpenMod.API.Permissions;
 using OpenMod.Extensions.Economy.Abstractions;
+using OpenMod.Extensions.Games.Abstractions.Items;
+using OpenMod.Extensions.Games.Abstractions.Players;
 using OpenMod.Extensions.Games.Abstractions.Vehicles;
-using OpenMod.Unturned.Users;
 using OpenMod.Unturned.Vehicles;
-using SDG.Unturned;
-using ShopsUI.API.Vehicles;
+using ShopsUI.API.Shops;
+using ShopsUI.API.Shops.Vehicles;
 using ShopsUI.Database.Models;
 using System;
 using System.Linq;
@@ -30,7 +32,9 @@ namespace ShopsUI.Shops.Vehicles
 
         public VehicleShopModel ShopData { get; }
 
-        IVehicleShopData IVehicleShop.ShopData => ShopData;
+        IVehicleShopData IShop<IVehicleShopData>.ShopData => ShopData;
+
+        public ushort Id => throw new NotImplementedException();
 
         public const string PermissionFormat = "groups.{0}";
 
@@ -60,7 +64,7 @@ namespace ShopsUI.Shops.Vehicles
 
         private async Task<UnturnedVehicleAsset> GetVehicleAsset()
         {
-            var id = ShopData.VehicleId.ToString();
+            var id = ShopData.Id.ToString();
 
             var vehicleAsset =
                 (await _vehicleDirectory.GetVehicleAssetsAsync()).FirstOrDefault(x => x.VehicleAssetId.Equals(id))
@@ -72,7 +76,12 @@ namespace ShopsUI.Shops.Vehicles
             return vehicleAsset;
         }
 
-        public async Task<decimal> Buy(UnturnedUser user)
+        public bool CanBuy()
+        {
+            return true;
+        }
+
+        public async UniTask<decimal> Buy<TPlayer>(IPlayerUser<TPlayer> user, int amount = 1) where TPlayer : IPlayer, IHasInventory
         {
             var vehicleAsset = await GetVehicleAsset();
 
@@ -91,7 +100,7 @@ namespace ShopsUI.Shops.Vehicles
             return balance;
         }
 
-        public async Task<bool> IsPermitted(IPermissionActor user)
+        public async UniTask<bool> IsPermitted(IPermissionActor user)
         {
             var blacklistEnabled = _configuration.GetValue("shops:blacklistEnabled", false);
             var whitelistEnabled = _configuration.GetValue("shops:whitelistEnabled", false);
@@ -110,7 +119,7 @@ namespace ShopsUI.Shops.Vehicles
                 if (blacklistEnabled && blacklistedGroups.Count > 0)
                 {
                     _logger.LogWarning(
-                        $"Vehicle shop with id {ShopData.VehicleId} has both a whitelist and a blacklist. Defaulting to using whitelist.");
+                        $"Vehicle shop with id {ShopData.Id} has both a whitelist and a blacklist. Defaulting to using whitelist.");
                 }
 
                 foreach (var group in whitelistedGroups)

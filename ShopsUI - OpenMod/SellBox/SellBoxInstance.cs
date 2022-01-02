@@ -2,7 +2,6 @@
 using HarmonyLib;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MoreLinq;
 using OpenMod.API.Permissions;
 using OpenMod.Core.Permissions;
 using OpenMod.Unturned.Users;

@@ -17,6 +17,21 @@ namespace ShopsUI.Migrations
                 .HasAnnotation("ProductVersion", "3.1.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("ShopsUI.Database.Models.ItemCategoryModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShopsUI_ItemCategories");
+                });
+
             modelBuilder.Entity("ShopsUI.Database.Models.ItemGroupModel", b =>
                 {
                     b.Property<int>("Id")
@@ -25,6 +40,9 @@ namespace ShopsUI.Migrations
 
                     b.Property<bool>("IsWhitelist")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<ushort>("ItemShopId")
+                        .HasColumnType("smallint unsigned");
 
                     b.Property<ushort>("ItemShopItemId")
                         .HasColumnType("smallint unsigned");
@@ -35,14 +53,29 @@ namespace ShopsUI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemShopItemId");
+                    b.HasIndex("ItemShopId");
 
                     b.ToTable("ShopsUI_ItemGroups");
                 });
 
+            modelBuilder.Entity("ShopsUI.Database.Models.ItemShopCategoryModel", b =>
+                {
+                    b.Property<int>("ItemCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<ushort>("ItemShopId")
+                        .HasColumnType("smallint unsigned");
+
+                    b.HasKey("ItemCategoryId", "ItemShopId");
+
+                    b.HasIndex("ItemShopId");
+
+                    b.ToTable("ShopsUI_ItemShopCategories");
+                });
+
             modelBuilder.Entity("ShopsUI.Database.Models.ItemShopModel", b =>
                 {
-                    b.Property<ushort>("ItemId")
+                    b.Property<ushort>("Id")
                         .HasColumnType("smallint unsigned");
 
                     b.Property<decimal?>("BuyPrice")
@@ -54,9 +87,24 @@ namespace ShopsUI.Migrations
                     b.Property<decimal?>("SellPrice")
                         .HasColumnType("decimal(24,2)");
 
-                    b.HasKey("ItemId");
+                    b.HasKey("Id");
 
                     b.ToTable("ShopsUI_ItemShops");
+                });
+
+            modelBuilder.Entity("ShopsUI.Database.Models.VehicleCategoryModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShopsUI_VehicleCategories");
                 });
 
             modelBuilder.Entity("ShopsUI.Database.Models.VehicleGroupModel", b =>
@@ -72,19 +120,37 @@ namespace ShopsUI.Migrations
                         .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<ushort>("VehicleShopId")
+                        .HasColumnType("smallint unsigned");
+
                     b.Property<ushort>("VehicleShopVehicleId")
                         .HasColumnType("smallint unsigned");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("VehicleShopVehicleId");
+                    b.HasIndex("VehicleShopId");
 
                     b.ToTable("ShopsUI_VehicleGroups");
                 });
 
+            modelBuilder.Entity("ShopsUI.Database.Models.VehicleShopCategoryModel", b =>
+                {
+                    b.Property<int>("VehicleCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<ushort>("VehicleShopId")
+                        .HasColumnType("smallint unsigned");
+
+                    b.HasKey("VehicleCategoryId", "VehicleShopId");
+
+                    b.HasIndex("VehicleShopId");
+
+                    b.ToTable("ShopsUI_VehicleShopCategories");
+                });
+
             modelBuilder.Entity("ShopsUI.Database.Models.VehicleShopModel", b =>
                 {
-                    b.Property<ushort>("VehicleId")
+                    b.Property<ushort>("Id")
                         .HasColumnType("smallint unsigned");
 
                     b.Property<decimal>("BuyPrice")
@@ -93,7 +159,7 @@ namespace ShopsUI.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.HasKey("VehicleId");
+                    b.HasKey("Id");
 
                     b.ToTable("ShopsUI_VehicleShops");
                 });
@@ -102,7 +168,22 @@ namespace ShopsUI.Migrations
                 {
                     b.HasOne("ShopsUI.Database.Models.ItemShopModel", "ItemShop")
                         .WithMany("AuthGroups")
-                        .HasForeignKey("ItemShopItemId")
+                        .HasForeignKey("ItemShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopsUI.Database.Models.ItemShopCategoryModel", b =>
+                {
+                    b.HasOne("ShopsUI.Database.Models.ItemCategoryModel", "ItemCategory")
+                        .WithMany("ItemShops")
+                        .HasForeignKey("ItemCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShopsUI.Database.Models.ItemShopModel", "ItemShop")
+                        .WithMany("Categories")
+                        .HasForeignKey("ItemShopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -111,7 +192,22 @@ namespace ShopsUI.Migrations
                 {
                     b.HasOne("ShopsUI.Database.Models.VehicleShopModel", "VehicleShop")
                         .WithMany("AuthGroups")
-                        .HasForeignKey("VehicleShopVehicleId")
+                        .HasForeignKey("VehicleShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopsUI.Database.Models.VehicleShopCategoryModel", b =>
+                {
+                    b.HasOne("ShopsUI.Database.Models.VehicleCategoryModel", "VehicleCategory")
+                        .WithMany("VehicleShops")
+                        .HasForeignKey("VehicleCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShopsUI.Database.Models.VehicleShopModel", "VehicleShop")
+                        .WithMany("Categories")
+                        .HasForeignKey("VehicleShopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

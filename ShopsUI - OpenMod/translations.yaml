@@ -36,6 +36,23 @@ commands:
         item: "Successfully removed blacklist for item {ItemAsset.ItemAssetId} with permission {Permission}."
         vehicle: "Successfully removed blacklist for vehicle {VehicleAsset.VehicleAssetId} with permission {Permission}."
     sellbox_sold: "You have sold {TotalAmount} items for {CurrencySymbol}{TotalPrice:0.00}. {ReturnedAmount} have been returned to you."
+    shop_category:
+      added:
+        item: "Successfully added {ShopsAdded} shops to the {CategoryName} item category."
+        vehicle: "Successfully added {ShopsAdded} shops to the {CategoryName} vehicle category."
+      removed:
+        item: "Removed {ShopsRemoved} shops from the {CategoryName} item category."
+        vehicle: "Removed {ShopsRemoved} shops from the {CategoryName} vehicle category."
+      created:
+        item: "Successfully created an item category with the name {CategoryName}."
+        vehicle: "Successfully created a vehicle category with the name {CategoryName}."
+      deleted:
+        confirm:
+          item: "Are you sure you would like to delete this item category (with {Category.Shops.Count} shops)? Run the command again if you'd like to continue."
+          vehicle: "Are you sure you would like to delete this vehicle category (with {Category.Shops.Count} shops)? Run the command again if you'd like to continue."
+        success:
+          item: "Successfully deleted the {CategoryName} item category."
+          vehicle: "Successfully deleted the {CategoryName} vehicle category."
       
   errors:
     invalid_item_id: "Given item id ({IdOrName}) does not exist."
@@ -51,6 +68,7 @@ commands:
     not_permitted_item: "You are not permitted to buy/sell {ItemAsset.ItemName}."
     not_permitted_vehicle: "You are not permitted to buy {VehicleAsset.VehicleName}."
     no_sellbox: "You cannot use /sellbox."
+    invalid_range: "The shop ID range provided is not valid (i.e. 100-200,400-550)."
     shop_whitelist:
       added:
         item: "A whitelist for this item could not be added. This shop may not exist or the whitelist has already been added."
@@ -65,6 +83,9 @@ commands:
       removed:
         item: "A blacklist for this item could not be removed. This shop may not exist or the blacklist has already been removed."
         vehicle: "A blacklist for this vehicle could not be removed. This shop may not exist or the blacklist has already been removed."
+    shop_category:
+      no_category: "Given shop category ({CategoryName}) does not exist."
+      category_already_exists: "The given category ({CategoryName}) already exists."
 
 transactions:
   items:
@@ -74,20 +95,31 @@ transactions:
     bought: "Purchased {VehicleAsset.VehicleName} for {CurrencySymbol}{Price:0.##}"
 
 ui:
-  header: "Shops"
-  balance: "Balance: {CurrencySymbol}{Balance:0.00}"
+  header: "Shops   <color=#4FFF4F>Balance: {CurrencySymbol}{Balance:0.##}</color>"
+  category: "   {Category.Name}   "
+  search: "Search..."
   items:
-    header: "Items"
     listing:
       content: "{ItemAsset.ItemName}"
       buy: "Buy for {CurrencySymbol}{BuyPrice:0.##}"
       sell: "Sell for {CurrencySymbol}{SellPrice:0.##}"
-    bought: "Successfully purchased."
-    sold: "Successfully sold."
+    bought: "Purchased x{Amount} {ItemAsset.ItemName}!"
+    sold: "Sold x{Amount} {ItemAsset.ItemName}!"
     not_permitted: "You are not permitted to do this."
   vehicles:
-    header: "Vehicles"
     listing:
       content: "{VehicleAsset.VehicleName}"
       buy: "Buy for {CurrencySymbol}{BuyPrice:0.##}"
     not_permitted: "You are not permitted to do this."
+  sellbox:
+    header: "Sell Box"
+    confirm: "Sell Items for {CurrencySymbol}{TotalSellPrice:0.##}"
+    cancel: "Cancel"
+    selling_items:
+      header: "Items to Sell:"
+      line: "- x{Amount} {ItemAsset.ItemName} for <color=#7FFF7F>{CurrencySymbol}{SellPrice:0.##}</color>"
+      none: "No Items "
+    returned_items:
+      header: "Returned Items:"
+      line: "- x{Amount} {ItemAsset.ItemName}"
+      none: "No Returned Items."

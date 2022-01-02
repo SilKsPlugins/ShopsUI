@@ -3,7 +3,7 @@ using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Users;
-using ShopsUI.API.Items;
+using ShopsUI.API.Shops;
 using System;
 
 namespace ShopsUI.Commands.Items
@@ -27,11 +27,13 @@ namespace ShopsUI.Commands.Items
             var asset = await GetItemAsset(0);
             var amount = await GetAmount(1);
 
-            var shop = await ShopManager.GetItemShop(ushort.Parse(asset.ItemAssetId));
+            var shop = await ItemShopDirectory.GetShop(ushort.Parse(asset.ItemAssetId));
 
             if (shop == null || !shop.CanBuy())
-                throw new UserFriendlyException(
-                    StringLocalizer["commands:errors:no_buyable_item_shop", new {ItemAsset = asset}]);
+            {
+                throw new UserFriendlyException(StringLocalizer["commands:errors:no_buyable_item_shop",
+                    new {ItemAsset = asset}]);
+            }
 
             if (!await shop.IsPermitted(Context.Actor))
             {

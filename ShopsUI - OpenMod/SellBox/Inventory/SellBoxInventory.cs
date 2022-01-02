@@ -8,11 +8,11 @@ namespace ShopsUI.SellBox.Inventory
 {
     public class SellBoxInventory : IInventory
     {
-        public InteractableStorage Storage { get; }
+        public IList<Item> Items { get; }
 
-        public SellBoxInventory(InteractableStorage storage)
+        public SellBoxInventory(IList<Item> items)
         {
-            Storage = storage;
+            Items = items;
         }
 
         public IReadOnlyCollection<IInventoryPage> Pages => new[] {new SellBoxInventoryPage(this)};

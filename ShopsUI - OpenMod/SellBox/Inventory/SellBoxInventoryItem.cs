@@ -9,16 +9,16 @@ namespace ShopsUI.SellBox.Inventory
 {
     public class SellBoxInventoryItem : IInventoryItem
     {
-        public SellBoxInventoryItem(SellBoxInventory inventory, ItemJar itemJar)
+        public SellBoxInventoryItem(SellBoxInventory inventory, Item item)
         {
             Inventory = inventory;
-            ItemJar = itemJar;
-            Item = new UnturnedItem(itemJar.item, DestroyAsync);
+            NativeItem = item;
+            Item = new UnturnedItem(item, DestroyAsync);
         }
 
         public SellBoxInventory Inventory { get; }
 
-        public ItemJar ItemJar { get; }
+        public Item NativeItem { get; }
 
         IItem IItemInstance.Item => Item;
 
@@ -30,16 +30,16 @@ namespace ShopsUI.SellBox.Inventory
             {
                 await UniTask.SwitchToMainThread();
 
-                var items = Inventory.Storage.items;
+                var items = Inventory.Items;
 
-                var index = items.items.IndexOf(ItemJar);
+                var index = items.IndexOf(NativeItem);
 
                 if (index < 0)
                 {
                     return false;
                 }
 
-                items.removeItem((byte)index);
+                items.RemoveAt(index);
 
                 return true;
             }

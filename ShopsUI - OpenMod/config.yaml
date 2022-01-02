@@ -13,10 +13,25 @@ shops:
   # When this setting is set to true, shop whitelists will not be ignored.
   whitelistEnabled: false
 
+  defaultCategory:
+    items:
+      enabled: true
+      name: "All"
+    vehicles:
+      enabled: true
+      name: "All"
+
 sellbox: # Default sellbox size. Set either to zero to disable by default.
   width: 8
   height: 6
 
 ui:
+  mainEffect: 29160
+  sellBoxEffect: 29300
+
   logoUrl: "https://i.imgur.com/t6HbFTN.png"
-  mainEffect: 29150
+
+  backgroundsEnabled: true # Sets whether or not the item rarity backgrounds are enabled.
+
+  buttonDelay: 1 # How long to wait until buy/sell buttons can be clicked again in seconds
+  categoryButtonDelay: 0.2 # How long to wait until category buttons can be clicked again in seconds.

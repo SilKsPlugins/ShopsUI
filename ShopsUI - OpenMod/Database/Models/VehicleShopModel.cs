@@ -1,4 +1,4 @@
-﻿using ShopsUI.API.Vehicles;
+﻿using ShopsUI.API.Shops.Vehicles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +10,7 @@ namespace ShopsUI.Database.Models
     public class VehicleShopModel : IVehicleShopData
     {
         [Key]
-        public ushort VehicleId { get; set; }
+        public ushort Id { get; set; }
 
         [Column(TypeName = "decimal(24,2)")]
         public decimal BuyPrice { get; set; }
@@ -19,9 +19,11 @@ namespace ShopsUI.Database.Models
 
         public virtual ICollection<VehicleGroupModel> AuthGroups { get; set; } = new List<VehicleGroupModel>();
 
+        public ICollection<VehicleShopCategoryModel>? Categories { get; set; }
+
         public VehicleShopModel()
         {
-            VehicleId = 0;
+            Id = 0;
             BuyPrice = 0;
             Order = 0;
         }

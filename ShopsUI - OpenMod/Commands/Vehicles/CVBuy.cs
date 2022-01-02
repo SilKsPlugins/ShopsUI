@@ -3,6 +3,7 @@ using OpenMod.API.Commands;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Users;
+using ShopsUI.API.Shops;
 using System;
 
 namespace ShopsUI.Commands.Vehicles
@@ -24,14 +25,14 @@ namespace ShopsUI.Commands.Vehicles
         {
             var asset = await GetVehicleAsset(0);
 
-            var shop = await ShopManager.GetVehicleShop(ushort.Parse(asset.VehicleAssetId))
-                       ?? throw new UserFriendlyException(
-                           StringLocalizer["commands:errors:no_buyable_vehicle_shop", new { VehicleAsset = asset }]);
+            var shop = await VehicleShopDirectory.GetShop(ushort.Parse(asset.VehicleAssetId))
+                       ?? throw new UserFriendlyException(StringLocalizer["commands:errors:no_buyable_vehicle_shop",
+                           new {VehicleAsset = asset}]);
 
             if (!await shop.IsPermitted(Context.Actor))
             {
                 throw new UserFriendlyException(StringLocalizer["commands:errors:not_permitted_vehicle",
-                    new { VehicleAsset = asset }]);
+                    new {VehicleAsset = asset}]);
             }
 
             var balance = await shop.Buy(GetUnturnedUser());

@@ -4,8 +4,7 @@ using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Commands;
 using OpenMod.Unturned.Users;
-using ShopsUI.API.UI;
-using ShopsUI.UI;
+using ShopsUI.UI.Items;
 using SilK.Unturned.Extras.UI;
 using System;
 
@@ -40,10 +39,7 @@ namespace ShopsUI.Commands.Items
                 throw new CommandWrongUsageException(Context);
             }
 
-            var session =
-                await _uiManager.StartSession<ShopsUISession>(user, lifetimeScope: _openModComponent.LifetimeScope);
-
-            await session.SetTab(UITab.Items);
+            await _uiManager.StartSession<ItemShopsUISession>(user, lifetimeScope: _openModComponent.LifetimeScope);
         }
     }
 }

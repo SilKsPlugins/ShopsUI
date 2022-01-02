@@ -1,8 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
-using OpenMod.Core.Commands;
-using OpenMod.Unturned.Commands;
-using System;
 using OpenMod.API.Commands;
+using OpenMod.Core.Commands;
+using ShopsUI.API.Shops.Items;
+using System;
 
 namespace ShopsUI.Commands.Items
 {
@@ -13,15 +13,19 @@ namespace ShopsUI.Commands.Items
     [CommandParent(typeof(CShopRem))]
     public class CShopRemBuy : ShopCommand
     {
-        public CShopRemBuy(IServiceProvider serviceProvider) : base(serviceProvider)
+        private readonly IItemShopEditor _shopEditor;
+
+        public CShopRemBuy(IServiceProvider serviceProvider,
+            IItemShopEditor shopEditor) : base(serviceProvider)
         {
+            _shopEditor = shopEditor;
         }
 
         protected override async UniTask OnExecuteAsync()
         {
             var asset = await GetItemAsset(0);
 
-            if (await ShopManager.RemoveItemShopBuyable(ushort.Parse(asset.ItemAssetId)))
+            if (await _shopEditor.RemoveItemShopBuyable(ushort.Parse(asset.ItemAssetId)))
             {
                 await PrintAsync(
                     StringLocalizer["commands:success:shop_removed:buyable_item", new {ItemAsset = asset}]);

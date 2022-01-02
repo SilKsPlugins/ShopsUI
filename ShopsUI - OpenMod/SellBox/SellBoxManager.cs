@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Autofac;
+using Cysharp.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -9,14 +10,12 @@ using OpenMod.Core.Helpers;
 using OpenMod.Extensions.Economy.Abstractions;
 using OpenMod.Unturned.Users;
 using OpenMod.Unturned.Users.Events;
-using ShopsUI.API;
-using ShopsUI.API.Items;
 using ShopsUI.API.SellBox;
-using ShopsUI.SellBox.Inventory;
+using ShopsUI.SellBox.UI;
 using SilK.Unturned.Extras.Events;
+using SilK.Unturned.Extras.UI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShopsUI.SellBox
@@ -29,18 +28,24 @@ namespace ShopsUI.SellBox
         private readonly ILogger<SellBoxManager> _logger;
         private readonly IStringLocalizer _stringLocalizer;
         private readonly IEconomyProvider _economyProvider;
+        private readonly IUIManager _uiManager;
+        private readonly ILifetimeScope _lifetimeScope;
 
         private readonly Dictionary<UnturnedUser, SellBoxInstance> _sellBoxes = new();
 
         public SellBoxManager(IServiceProvider serviceProvider,
             ILogger<SellBoxManager> logger,
             IStringLocalizer stringLocalizer,
-            IEconomyProvider economyProvider)
+            IEconomyProvider economyProvider,
+            IUIManager uiManager,
+            ILifetimeScope lifetimeScope)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
             _stringLocalizer = stringLocalizer;
             _economyProvider = economyProvider;
+            _uiManager = uiManager;
+            _lifetimeScope = lifetimeScope;
 
             SellBoxInstance.OnSellBoxClosed += OnSellBoxClosed;
         }
@@ -95,86 +100,22 @@ namespace ShopsUI.SellBox
         {
             UniTask.RunOnThreadPool(async () =>
             {
-                if (sellBox.Storage == null)
+                if (sellBox.Storage == null || sellBox.Storage.items.items.Count == 0)
                 {
                     return;
                 }
 
-                var items = sellBox.Storage.items.items.Select(x => x.item).ToList();
-
-                if (sellBox.Storage.items.items.Count == 0)
+                var lifetimeScope = _lifetimeScope.BeginLifetimeScope(builder =>
                 {
-                    return;
-                }
+                    builder.RegisterInstance(sellBox)
+                        .SingleInstance()
+                        .ExternallyOwned();
+                });
 
-                await UniTask.SwitchToThreadPool();
+                var session = await _uiManager.StartSession<SellBoxUISession>(user,
+                    new UISessionOptions { EndOnDeath = true }, lifetimeScope);
 
-                var shopManager = _serviceProvider.GetRequiredService<IShopManager>();
-
-                var itemShops = new List<(IItemShop shop, int amount)>();
-
-                foreach (var grouping in items.GroupBy(x => x.id))
-                {
-                    var shop = await shopManager.GetItemShop(grouping.Key);
-
-                    if (shop != null && shop.CanSell())
-                    {
-                        itemShops.Add((shop, grouping.Count()));
-                    }
-                }
-
-                var inventory = new SellBoxInventory(sellBox.Storage);
-
-                decimal totalPrice = 0;
-                var totalAmount = 0;
-
-                foreach (var pair in itemShops.ToList())
-                {
-                    try
-                    {
-                        var shop = pair.shop;
-                        var amount = pair.amount;
-
-                        await shop.Sell(user, inventory, amount);
-
-                        totalPrice += shop.ShopData.SellPrice!.Value;
-                        totalAmount += amount;
-
-                        itemShops.Remove(pair);
-                    }
-                    catch (UserFriendlyException ex)
-                    {
-                        _logger.LogDebug(ex, "User friendly exception occurred during selling");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error occurred when selling item");
-                    }
-                }
-
-                var totalReturned = 0;
-
-                await UniTask.SwitchToMainThread();
-
-                foreach (var itemJar in inventory.Storage.items.items)
-                {
-                    var item = itemJar.item;
-
-                    user.Player.Player.inventory.forceAddItem(item, false);
-
-                    totalReturned++;
-                }
-
-                await user.PrintMessageAsync(_stringLocalizer["commands:success:sellbox_sold",
-                    new
-                    {
-                        TotalAmount = totalAmount,
-                        TotalPrice = totalPrice,
-                        ReturnedAmount = totalReturned,
-                        _economyProvider.CurrencySymbol,
-                        _economyProvider.CurrencyName
-                    }]);
-
+                session.OnUISessionEnded += _ => AsyncHelper.RunSync(async () => await lifetimeScope.DisposeAsync());
             }).Forget();
         }
     }

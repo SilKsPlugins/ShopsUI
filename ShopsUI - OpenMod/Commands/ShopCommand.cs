@@ -8,7 +8,8 @@ using OpenMod.Extensions.Games.Abstractions.Vehicles;
 using OpenMod.Unturned.Commands;
 using OpenMod.Unturned.Items;
 using OpenMod.Unturned.Users;
-using ShopsUI.API;
+using ShopsUI.API.Shops.Items;
+using ShopsUI.API.Shops.Vehicles;
 using System;
 using System.Threading.Tasks;
 
@@ -17,33 +18,40 @@ namespace ShopsUI.Commands
     [DontAutoRegister]
     public abstract class ShopCommand : UnturnedCommand
     {
-        protected readonly IStringLocalizer StringLocalizer;
+        protected readonly IItemShopDirectory ItemShopDirectory;
+        protected readonly IVehicleShopDirectory VehicleShopDirectory;
+
         protected readonly IItemDirectory ItemDirectory;
         protected readonly IVehicleDirectory VehicleDirectory;
-        protected readonly IShopManager ShopManager;
+
+        protected readonly IStringLocalizer StringLocalizer;
         protected readonly IEconomyProvider EconomyProvider;
 
-        protected ShopCommand(
-            IServiceProvider serviceProvider) : base(serviceProvider)
+        protected ShopCommand(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            StringLocalizer = serviceProvider.GetRequiredService<IStringLocalizer>();
+            ItemShopDirectory = serviceProvider.GetRequiredService<IItemShopDirectory>();
+            VehicleShopDirectory = serviceProvider.GetRequiredService<IVehicleShopDirectory>();
             ItemDirectory = serviceProvider.GetRequiredService<IItemDirectory>();
             VehicleDirectory = serviceProvider.GetRequiredService<IVehicleDirectory>();
-            ShopManager = serviceProvider.GetRequiredService<IShopManager>();
+            StringLocalizer = serviceProvider.GetRequiredService<IStringLocalizer>();
             EconomyProvider = serviceProvider.GetRequiredService<IEconomyProvider>();
         }
 
         protected void ValidatePrice(decimal price)
         {
             if (price < 0)
+            {
                 throw new UserFriendlyException(StringLocalizer["commands:errors:invalid_price", new {Price = price}]);
+            }
         }
 
         protected void ValidateAmount(int amount)
         {
             if (amount < 1)
+            {
                 throw new UserFriendlyException(
-                    StringLocalizer["commands:errors:invalid_amount", new { Amount = amount }]);
+                    StringLocalizer["commands:errors:invalid_amount", new {Amount = amount}]);
+            }
         }
 
         protected async Task<IItemAsset> GetItemAsset(int index)
@@ -76,7 +84,10 @@ namespace ShopsUI.Commands
             var idOrName = await Context.Parameters.GetAsync<string>(index);
 
             if (string.IsNullOrWhiteSpace(idOrName))
-                throw new UserFriendlyException(StringLocalizer["commands:errors:invalid_vehicle_id", new { IdOrName = idOrName }]);
+            {
+                throw new UserFriendlyException(StringLocalizer["commands:errors:invalid_vehicle_id",
+                    new {IdOrName = idOrName}]);
+            }
 
             return await VehicleDirectory.FindByIdAsync(idOrName)
                    ?? await VehicleDirectory.FindByNameAsync(idOrName, false)

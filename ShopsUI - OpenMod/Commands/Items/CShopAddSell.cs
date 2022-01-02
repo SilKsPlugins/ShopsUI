@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using OpenMod.API.Prioritization;
 using OpenMod.Core.Commands;
+using ShopsUI.API.Shops.Items;
 using System;
 
 namespace ShopsUI.Commands.Items
@@ -12,8 +13,12 @@ namespace ShopsUI.Commands.Items
     [CommandParent(typeof(CShopAdd))]
     public class CShopAddSell : ShopCommand
     {
-        public CShopAddSell(IServiceProvider serviceProvider) : base(serviceProvider)
+        private readonly IItemShopEditor _shopEditor;
+
+        public CShopAddSell(IServiceProvider serviceProvider,
+            IItemShopEditor shopEditor) : base(serviceProvider)
         {
+            _shopEditor = shopEditor;
         }
 
         protected override async UniTask OnExecuteAsync()
@@ -21,7 +26,7 @@ namespace ShopsUI.Commands.Items
             var asset = await GetItemAsset(0);
             var price = await GetPrice(1);
 
-            await ShopManager.AddItemShopSellable(ushort.Parse(asset.ItemAssetId), price);
+            await _shopEditor.AddItemShopSellable(ushort.Parse(asset.ItemAssetId), price);
 
             await PrintAsync(
                 StringLocalizer["commands:success:shop_added:sellable_item",

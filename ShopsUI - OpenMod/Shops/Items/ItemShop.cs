@@ -8,8 +8,10 @@ using OpenMod.API.Permissions;
 using OpenMod.API.Users;
 using OpenMod.Extensions.Economy.Abstractions;
 using OpenMod.Extensions.Games.Abstractions.Items;
+using OpenMod.Extensions.Games.Abstractions.Players;
 using OpenMod.Unturned.Items;
-using ShopsUI.API.Items;
+using ShopsUI.API.Shops;
+using ShopsUI.API.Shops.Items;
 using ShopsUI.Database.Models;
 using System;
 using System.Linq;
@@ -31,7 +33,10 @@ namespace ShopsUI.Shops.Items
 
         public ItemShopModel ShopData { get; }
 
-        IItemShopData IItemShop.ShopData => ShopData;
+        IItemShopData IShop<IItemShopData>.ShopData => ShopData;
+
+        public ushort Id => ShopData.Id;
+
 
         public const string PermissionFormat = "groups.{0}";
 
@@ -62,12 +67,14 @@ namespace ShopsUI.Shops.Items
 
         private async Task<UnturnedItemAsset> GetItemAsset()
         {
-            var id = ShopData.ItemId.ToString();
+            var id = ShopData.Id.ToString();
 
             var itemAsset = await _itemDirectory.FindByIdAsync(id);
 
             if (itemAsset is not UnturnedItemAsset unturnedItemAsset || unturnedItemAsset.ItemAsset.isPro)
+            {
                 throw new Exception($"Item id '{id}' has no asset");
+            }
 
             return unturnedItemAsset;
         }
@@ -75,18 +82,22 @@ namespace ShopsUI.Shops.Items
         private void VerifyAmount(int amount)
         {
             if (amount < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(amount), amount, "Amount was out of range");
+            }
         }
 
         public bool CanBuy() => ShopData.BuyPrice != null;
 
-        public async Task<decimal> Buy(IUser user, IInventory inventory, int amount = 1)
+        public async UniTask<decimal> Buy<TPlayer>(IPlayerUser<TPlayer> user, int amount = 1) where TPlayer : IPlayer, IHasInventory
         {
             if (!CanBuy())
+            {
                 throw new InvalidOperationException("No buying at this shop");
+            }
 
             VerifyAmount(amount);
-            
+
             var itemAsset = await GetItemAsset();
 
             await UniTask.SwitchToMainThread();
@@ -108,6 +119,9 @@ namespace ShopsUI.Shops.Items
             {
                 var itemState = new AdminItemState(itemAsset);
 
+                var inventory = user.Player.Inventory ??
+                                throw new Exception("Player has no inventory");
+
                 var item = await _itemSpawner.GiveItemAsync(inventory, itemAsset, itemState);
 
                 if (item == null)
@@ -121,7 +135,7 @@ namespace ShopsUI.Shops.Items
 
         public bool CanSell() => ShopData.SellPrice != null;
 
-        public async Task<decimal> Sell(IUser user, IInventory inventory, int amount = 1)
+        public async UniTask<decimal> Sell(IUser user, IInventory inventory, int amount = 1)
         {
             if (!CanSell())
                 throw new InvalidOperationException("No selling at this shop");
@@ -132,7 +146,7 @@ namespace ShopsUI.Shops.Items
 
             await UniTask.SwitchToMainThread();
 
-            var id = ShopData.ItemId.ToString();
+            var id = ShopData.Id.ToString();
 
             var count = inventory.Pages.SelectMany(x => x.Items)
                 .Count(inventoryItem => inventoryItem.Item.Asset.ItemAssetId == id);
@@ -175,16 +189,27 @@ namespace ShopsUI.Shops.Items
                     }]);
         }
 
-        public async Task<bool> IsPermitted(IPermissionActor user)
+        public async UniTask<bool> IsPermitted(IPermissionActor user)
         {
             var blacklistEnabled = _configuration.GetValue("shops:blacklistEnabled", false);
             var whitelistEnabled = _configuration.GetValue("shops:whitelistEnabled", false);
 
-            if (!blacklistEnabled && !whitelistEnabled) return true;
+            if (!blacklistEnabled && !whitelistEnabled)
+            {
+                return true;
+            }
+
+            if (ShopData.AuthGroups == null)
+            {
+                return true;
+            }
 
             var groups = ShopData.AuthGroups.ToList();
 
-            if (groups.Count == 0) return true;
+            if (groups.Count == 0)
+            {
+                return true;
+            }
 
             var blacklistedGroups = groups.Where(x => !x.IsWhitelist).ToList();
             var whitelistedGroups = groups.Where(x => x.IsWhitelist).ToList();
@@ -194,7 +219,7 @@ namespace ShopsUI.Shops.Items
                 if (blacklistEnabled && blacklistedGroups.Count > 0)
                 {
                     _logger.LogWarning(
-                        $"Item shop with id {ShopData.ItemId} has both a whitelist and a blacklist. Defaulting to using whitelist.");
+                        $"Item shop with id {ShopData.Id} has both a whitelist and a blacklist. Defaulting to using whitelist.");
                 }
 
                 foreach (var group in whitelistedGroups)
