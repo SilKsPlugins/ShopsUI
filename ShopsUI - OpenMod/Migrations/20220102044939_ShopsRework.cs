@@ -30,30 +30,20 @@ namespace ShopsUI.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_ShopsUI_ItemGroups_ItemShopItemId",
                 table: "ShopsUI_ItemGroups");
-
-            migrationBuilder.DropColumn(
+            
+            migrationBuilder.RenameColumn(
                 name: "VehicleId",
-                table: "ShopsUI_VehicleShops");
-
-            migrationBuilder.DropColumn(
-                name: "ItemId",
-                table: "ShopsUI_ItemShops");
-
-            migrationBuilder.AddColumn<ushort>(
-                name: "Id",
                 table: "ShopsUI_VehicleShops",
-                nullable: false,
-                defaultValue: (ushort)0);
+                newName: "Id");
+            
+            migrationBuilder.RenameColumn(
+                name: "ItemId",
+                table: "ShopsUI_ItemShops",
+                newName: "Id");
 
             migrationBuilder.AddColumn<ushort>(
                 name: "VehicleShopId",
                 table: "ShopsUI_VehicleGroups",
-                nullable: false,
-                defaultValue: (ushort)0);
-
-            migrationBuilder.AddColumn<ushort>(
-                name: "Id",
-                table: "ShopsUI_ItemShops",
                 nullable: false,
                 defaultValue: (ushort)0);
 
@@ -222,35 +212,23 @@ namespace ShopsUI.Migrations
                 name: "IX_ShopsUI_ItemGroups_ItemShopId",
                 table: "ShopsUI_ItemGroups");
 
-            migrationBuilder.DropColumn(
+            migrationBuilder.RenameColumn(
                 name: "Id",
-                table: "ShopsUI_VehicleShops");
+                table: "ShopsUI_VehicleShops",
+                newName: "VehicleId");
+
+            migrationBuilder.RenameColumn(
+                name: "Id",
+                table: "ShopsUI_ItemShops",
+                newName: "ItemId");
 
             migrationBuilder.DropColumn(
                 name: "VehicleShopId",
                 table: "ShopsUI_VehicleGroups");
 
             migrationBuilder.DropColumn(
-                name: "Id",
-                table: "ShopsUI_ItemShops");
-
-            migrationBuilder.DropColumn(
                 name: "ItemShopId",
                 table: "ShopsUI_ItemGroups");
-
-            migrationBuilder.AddColumn<ushort>(
-                name: "VehicleId",
-                table: "ShopsUI_VehicleShops",
-                type: "smallint unsigned",
-                nullable: false,
-                defaultValue: (ushort)0);
-
-            migrationBuilder.AddColumn<ushort>(
-                name: "ItemId",
-                table: "ShopsUI_ItemShops",
-                type: "smallint unsigned",
-                nullable: false,
-                defaultValue: (ushort)0);
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_ShopsUI_VehicleShops",
