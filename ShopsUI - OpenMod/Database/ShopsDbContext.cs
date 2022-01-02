@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using OpenMod.EntityFrameworkCore;
 using OpenMod.EntityFrameworkCore.Configurator;
+using Pomelo.EntityFrameworkCore.MySql.Storage;
 using ShopsUI.Database.Models;
 using System;
 
@@ -8,12 +10,16 @@ namespace ShopsUI.Database
 {
     public class ShopsDbContext : OpenModDbContext<ShopsDbContext>
     {
+        private readonly IServiceProvider _serviceProvider;
+
         public ShopsDbContext(IServiceProvider serviceProvider) : base(serviceProvider)
         {
+            _serviceProvider = serviceProvider;
         }
 
         public ShopsDbContext(IDbContextConfigurator configurator, IServiceProvider serviceProvider) : base(configurator, serviceProvider)
         {
+            _serviceProvider = serviceProvider;
         }
 
         public DbSet<ItemShopModel> ItemShops => Set<ItemShopModel>();
@@ -31,6 +37,20 @@ namespace ShopsUI.Database
         public DbSet<VehicleCategoryModel> VehicleCategories => Set<VehicleCategoryModel>();
 
         public DbSet<VehicleShopCategoryModel> VehicleShopCategories => Set<VehicleShopCategoryModel>();
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var connectionStringName = GetConnectionStringName();
+            var connectionStringAccessor = _serviceProvider.GetRequiredService<IConnectionStringAccessor>();
+            var connectionString = connectionStringAccessor.GetConnectionString(connectionStringName);
+
+            optionsBuilder.UseMySql(connectionString!,
+                options =>
+                {
+                    options.MigrationsHistoryTable(MigrationsTableName);
+                    options.ServerVersion(ServerVersion.AutoDetect(connectionString));
+                });
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
