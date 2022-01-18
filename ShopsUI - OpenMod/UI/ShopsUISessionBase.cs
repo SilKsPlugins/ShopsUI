@@ -77,8 +77,10 @@ namespace ShopsUI.UI
             var loggerType = typeof(ILogger<>).MakeGenericType(GetType());
             Logger = (ILogger)serviceProvider.GetRequiredService(loggerType);
 
-            _shopsUIList = new UIList<ShopInfo>(UIElements.MaxShopItems, DisplayShopItem, DisplayNoShopItem);
-            _categoriesUIList = new UIList<IShopCategory<TShopData>>(UIElements.MaxCategories, DisplayCategory, DisplayNoCategory);
+            _shopsUIList = new UIList<ShopInfo>(UIElements.MaxShopItems, DisplayShopItem, DisplayNoShopItem,
+                Configuration.Instance.UI.DisplayDelay, Configuration.Instance.UI.DisplayAmount);
+            _categoriesUIList = new UIList<IShopCategory<TShopData>>(UIElements.MaxCategories, DisplayCategory,
+                DisplayNoCategory, 0, int.MaxValue);
 
             EffectId = Configuration.Instance.UI.ShopsEffect;
         }
@@ -206,7 +208,7 @@ namespace ShopsUI.UI
 
         private async UniTask ShowCategories(IEnumerable<IShopCategory<TShopData>> categories)
         {
-            await _categoriesUIList.UpdateContents(categories);
+            await _categoriesUIList.UpdateContents(categories, CancellationToken);
         }
 
         private void DisplayCategory(IShopCategory<TShopData> element, int index)
@@ -254,12 +256,12 @@ namespace ShopsUI.UI
 
             if (_searchFilter == null)
             {
-                await _shopsUIList.UpdateContents(_currentShopsList);
+                await _shopsUIList.UpdateContents(_currentShopsList, CancellationToken);
             }
             else
             {
                 await _shopsUIList.UpdateContents(_currentShopsList.Where(x =>
-                    x.SearchName.IndexOf(_searchFilter, StringComparison.OrdinalIgnoreCase) >= 0));
+                    x.SearchName.IndexOf(_searchFilter, StringComparison.OrdinalIgnoreCase) >= 0), CancellationToken);
             }
         }
 

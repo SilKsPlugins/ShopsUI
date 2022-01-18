@@ -20,5 +20,9 @@ namespace ShopsUI.Configuration
         public bool ShowEmptyCategories { get; set; } = false;
 
         public bool ShowSellOnlyShops { get; set; } = true;
+
+        public float DisplayDelay { get; set; } = 0.5f;
+
+        public int DisplayAmount { get; set; } = 10;
     }
 }

@@ -38,3 +38,7 @@ ui:
 
   showEmptyCategories: false
   showSellOnlyShops: true
+
+  # Advanced settings
+  displayDelay: 0.5 # Time between sending bundles of shops in the UI (in seconds)
+  displayAmount: 10 # Number of shops in bundle to send each iteration
