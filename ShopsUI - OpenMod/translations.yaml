@@ -11,7 +11,7 @@ commands:
       buyable_vehicle: "The vehicle {VehicleAsset.VehicleName} can no longer be sold."
     item_bought: "You have bought x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{Price:0.00}. Your balance is now {CurrencySymbol}{Balance:0.00}."
     item_sold: "You have sold x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{Price:0.00}. Your balance is now {CurrencySymbol}{Balance:0.00}."
-    vehicle_bought: "You have bought a {ItemAsset.ItemName} for {CurrencySymbol}{Price:0.00}. Your balance is now {CurrencySymbol}{Balance:0.00}."
+    vehicle_bought: "You have bought a {VehicleAsset.VehicleName} for {CurrencySymbol}{Price:0.00}. Your balance is now {CurrencySymbol}{Balance:0.00}."
     item_cost:
       buy: "You can buy x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{BuyPrice:0.00}."
       sell: "You can sell x{Amount} {ItemAsset.ItemName} for {CurrencySymbol}{SellPrice:0.00}."
