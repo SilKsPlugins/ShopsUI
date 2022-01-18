@@ -50,10 +50,11 @@ namespace ShopsUI.Shops.Items
             }
         }
 
-        protected override IIncludableQueryable<ItemCategoryModel, ICollection<ItemShopCategoryModel>?> GetIncludeShopsQueryable(ShopsDbContext dbContext)
+        protected override IIncludableQueryable<ItemCategoryModel, ItemShopModel> GetIncludeShopsQueryable(ShopsDbContext dbContext)
         {
             return dbContext.Set<ItemCategoryModel>()
-                .Include(x => x.ItemShops);
+                .Include(x => x.ItemShops)
+                .ThenInclude(x => x.ItemShop);
         }
     }
 }

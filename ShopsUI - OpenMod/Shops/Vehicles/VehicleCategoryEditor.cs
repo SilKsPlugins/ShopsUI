@@ -9,7 +9,6 @@ using ShopsUI.API.Shops.Vehicles;
 using ShopsUI.Database;
 using ShopsUI.Database.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ShopsUI.Shops.Vehicles
@@ -50,10 +49,11 @@ namespace ShopsUI.Shops.Vehicles
             }
         }
 
-        protected override IIncludableQueryable<VehicleCategoryModel, ICollection<VehicleShopCategoryModel>?> GetIncludeShopsQueryable(ShopsDbContext dbContext)
+        protected override IIncludableQueryable<VehicleCategoryModel, VehicleShopModel> GetIncludeShopsQueryable(ShopsDbContext dbContext)
         {
             return dbContext.Set<VehicleCategoryModel>()
-                .Include(x => x.VehicleShops);
+                .Include(x => x.VehicleShops)
+                .ThenInclude(x => x.VehicleShop);
         }
     }
 }

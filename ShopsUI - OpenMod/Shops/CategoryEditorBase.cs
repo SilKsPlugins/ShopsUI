@@ -32,8 +32,8 @@ namespace ShopsUI.Shops
 
         protected abstract void RemoveShopFromCategoryModel(TCategoryModel category, ushort shopId);
 
-        protected abstract IIncludableQueryable<TCategoryModel, ICollection<TShopCategoryModel>?>
-            GetIncludeShopsQueryable(ShopsDbContext dbContext);
+        protected abstract IIncludableQueryable<TCategoryModel, TShopDataModel> GetIncludeShopsQueryable(
+            ShopsDbContext dbContext);
 
         public async Task<bool> CreateCategory(string displayName)
         {
