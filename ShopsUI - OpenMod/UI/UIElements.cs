@@ -19,6 +19,8 @@
 
         public static readonly UIListDetails ShopItems = new("ShopItem ({0})");
 
+        public const string ShopItemsClearer = "ShopItemsClearer";
+
         public static readonly UIListDetails ShopItemNames = new("ItemName ({0})");
         public static readonly UIListDetails ShopItemResetters = new("ShopItemResetter ({0})");
         public static readonly UIListDetails ShopItemImages = new("ItemImage ({0})");

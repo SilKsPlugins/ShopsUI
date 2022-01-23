@@ -52,7 +52,7 @@ namespace ShopsUI.UI
         protected readonly TShopDirectory ShopDirectory;
         protected readonly ILogger Logger;
 
-        private readonly UIList<ShopInfo> _shopsUIList;
+        private readonly UIListClearable<ShopInfo> _shopsUIList;
         private readonly UIList<IShopCategory<TShopData>> _categoriesUIList;
 
         private DateTime _lastCategory = DateTime.MinValue;
@@ -77,7 +77,7 @@ namespace ShopsUI.UI
             var loggerType = typeof(ILogger<>).MakeGenericType(GetType());
             Logger = (ILogger)serviceProvider.GetRequiredService(loggerType);
 
-            _shopsUIList = new UIList<ShopInfo>(UIElements.MaxShopItems, DisplayShopItem, DisplayNoShopItem,
+            _shopsUIList = new UIListClearable<ShopInfo>(UIElements.MaxShopItems, DisplayShopItem, ClearShopItems,
                 Configuration.Instance.UI.DisplayDelay, Configuration.Instance.UI.DisplayAmount);
             _categoriesUIList = new UIList<IShopCategory<TShopData>>(UIElements.MaxCategories, DisplayCategory,
                 DisplayNoCategory, 0, int.MaxValue);
@@ -209,6 +209,13 @@ namespace ShopsUI.UI
         private async UniTask ShowCategories(IEnumerable<IShopCategory<TShopData>> categories)
         {
             await _categoriesUIList.UpdateContents(categories, CancellationToken);
+        }
+
+        private void ClearShopItems()
+        {
+            Logger.LogDebug("CLEARING SHOP ITEMS");
+
+            SendVisibility(UIElements.ShopItemsClearer, true);
         }
 
         private void DisplayCategory(IShopCategory<TShopData> element, int index)
