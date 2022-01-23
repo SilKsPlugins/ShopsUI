@@ -46,8 +46,6 @@ namespace ShopsUI.UI.Items
         {
             SendVisibility(UIElements.ShopItems[index], true);
 
-            Logger.LogDebug($"Shop item image URL: {shopInfo.ImageUrl}");
-
             if (!string.IsNullOrEmpty(shopInfo.ImageUrl))
             {
                 SendVisibility(UIElements.ShopItemImages[index], true);
