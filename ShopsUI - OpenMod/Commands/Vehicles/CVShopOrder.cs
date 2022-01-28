@@ -26,7 +26,7 @@ namespace ShopsUI.Commands.Vehicles
             var asset = await GetVehicleAsset(0);
             var order = await Context.Parameters.GetAsync<int>(1);
 
-            var shop = await _dbContext.VehicleShops.FindAsync(int.Parse(asset.VehicleAssetId)) ??
+            var shop = await _dbContext.VehicleShops.FindAsync(ushort.Parse(asset.VehicleAssetId)) ??
                        throw new UserFriendlyException(
                            StringLocalizer["commands:errors:no_vehicle_shop", new { VehicleAsset = asset }]);
 

@@ -26,7 +26,7 @@ namespace ShopsUI.Commands.Items
             var asset = await GetItemAsset(0);
             var order = await Context.Parameters.GetAsync<int>(1);
 
-            var shop = await _dbContext.ItemShops.FindAsync(int.Parse(asset.ItemAssetId)) ??
+            var shop = await _dbContext.ItemShops.FindAsync(ushort.Parse(asset.ItemAssetId)) ??
                        throw new UserFriendlyException(
                            StringLocalizer["commands:errors:no_item_shop", new {ItemAsset = asset}]);
 
