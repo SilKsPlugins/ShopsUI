@@ -255,7 +255,7 @@ namespace ShopsUI.UI
 
         private async UniTask ShowShops(IEnumerable<ShopInfo> itemShops)
         {
-            _currentShopsList = itemShops.ToList();
+            _currentShopsList = itemShops.OrderBy(x => x.ShopData.Order).ToList();
 
             _currentShopsList.RemoveAll(x => !ShouldShowShop(x.ShopData));
 
